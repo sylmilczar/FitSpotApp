@@ -1,0 +1,4 @@
+# Ignore any file or directory with "10x-" in its name
+*10x-*
+
+.DS_Store
