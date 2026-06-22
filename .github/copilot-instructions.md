@@ -69,3 +69,44 @@ The shipped skill carries no 10xDevs / cohort / certification references. The po
 Skills must not write to `context/archive/`. Archived changes are immutable; if a resolved target path starts with `context/archive/`, abort with: "This change is archived. Open a new change with `/10x-new` instead."
 
 <!-- END @przeprogramowani/10x-cli -->
+
+## Command policy
+
+Interpret the following rules as a permission model.
+
+### ALLOW
+
+You may execute:
+
+- npm *
+- npx *
+- node *
+- git add *
+- git commit *
+- git diff *
+- git log *
+- git status *
+- git branch *
+- git checkout *
+- git stash *
+- Read
+- Edit
+- Write
+
+### ASK
+
+Always ask for confirmation before executing:
+
+- curl *
+- wget *
+- git push *
+
+### DENY
+
+Never execute:
+
+- rm -rf *
+
+Do not bypass denied commands using equivalent commands.
+
+When a command is not explicitly listed above, ask for confirmation before executing it.
