@@ -31,9 +31,9 @@
 
 ---
 
-## Phase 1 — Adapter Migration (development branch) ⏳ IN PROGRESS
+## Phase 1 — Adapter Migration (development branch) ✅ COMPLETED
 
-**Status:** Ready to start
+**Status:** Completed on 2026-06-27 18:28 UTC
 
 8. `npm install @astrojs/vercel`
 9. Edit `astro.config.mjs`:
@@ -50,7 +50,9 @@
 
 ---
 
-## Phase 2 — Merge & Production Supabase Setup (main branch) ⬜ NOT STARTED
+## Phase 2 — Merge & Production Supabase Setup (main branch) ⏳ IN PROGRESS
+
+**Status:** Ready to start
 
 15. `git checkout main && git merge development` — merge adapter changes to main
 16. Go to https://supabase.com → New project (separate from dev) → note **Project URL** and **Project Ref**

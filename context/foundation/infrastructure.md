@@ -237,6 +237,43 @@ Update your Astro env.d.ts to use pooled URL if available (optional—Supabase c
 
 ---
 
+## Important: Package.json Build Configuration
+
+**Critical**: If this project was bootstrapped from `10x-astro-starter` or another framework starter, check `package.json` for `"overrides"` constraints before deploying to Vercel:
+
+```json
+"overrides": {
+  "vite": "^7.3.2"
+}
+```
+
+**Why this matters**: Vite overrides from previous adapter configurations (e.g., `@astrojs/cloudflare`) may conflict with the Vercel adapter. The Vercel SSR build requires Vite 6.x or compatible; pinning to `^7.3.2` can cause `rollupOptions.input should not be an html file when building for SSR` errors.
+
+**What to do**:
+
+1. **Before migration**: Review `package.json` for `"overrides"` section
+2. **During adapter swap**: Remove or relax version constraints that are not essential:
+   ```bash
+   # Remove problematic overrides
+   npm uninstall && npm install  # Fresh install without overrides
+   ```
+3. **Verify build works**: `npm run build` should complete without SSR errors
+4. **CSS updates**: If migrating from Cloudflare to Vercel, also check `src/styles/global.css` — update `@import "tailwindcss"` to `@tailwind` directives for Tailwind 4 compatibility
+
+**Example fix**: After removing Vite override, if Tailwind fails with "ENOENT: no such file or directory, open 'tailwindcss'", create `tailwind.config.mjs`:
+
+```javascript
+export default {
+  content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  theme: { extend: {} },
+  plugins: [],
+};
+```
+
+This is a one-time check during adapter migration, not a recurring maintenance task.
+
+---
+
 ## Out of Scope
 
 The following were not evaluated in this research:
