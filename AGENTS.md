@@ -1,6 +1,6 @@
 # Repository Guidelines
 
-FitSpotApp is an Astro 7 full-stack SSR application for fitness class bookings, built with React 19 islands, Tailwind 4, Supabase authentication, and deployed to Cloudflare Workers. All pages render server-side by default; React is used only for interactive components.
+FitSpotApp is an Astro 7 full-stack SSR application for fitness class bookings, built with React 19 islands, Tailwind 4, Supabase authentication, and deployed to Vercel. All pages render server-side by default; React is used only for interactive components.
 
 **Maintenance:** This file is the canonical source of truth for all project rules. CLAUDE.md references this file. Always edit AGENTS.md; never update rules in both files.
 
@@ -9,6 +9,7 @@ FitSpotApp is an Astro 7 full-stack SSR application for fitness class bookings, 
 - **Server-side rendering is mandatory.** All pages export Astro components; they render server-side by default. Mark API routes with `const prerender = false`. Never add `"use client"` or client-side rendering directives—Astro does not support them.
 - **Supabase auth uses SSR client with cookies, not tokens.** Middleware resolves the current user from session cookies on every request and attaches to `context.locals.user`. See `@src/middleware.ts` and `@src/lib/supabase.ts`. Never store auth state in React local state for page-level decisions; middleware always runs first.
 - **Conditional Tailwind classes require `cn()` helper.** Import from `@/lib/utils` (clsx + tailwind-merge). Do not concatenate class strings. Example: `cn("px-2", isActive && "bg-blue-500")`.
+- **Tailwind 4 uses Vite plugin, not PostCSS.** The CSS entry point is `src/styles/global.css` with `@import "tailwindcss"` (NOT `@tailwind base/components/utilities` — that is Tailwind v3 syntax). The Vite plugin (`@tailwindcss/vite`) is configured in `astro.config.mjs` under `vite.plugins`. Do NOT add `postcss.config.*` or `tailwind.config.*` files — Tailwind 4 uses CSS-first configuration via `@theme` in `global.css`. Do NOT install `@tailwindcss/postcss` alongside `@tailwindcss/vite`.
 - **Protected routes are enforced in middleware.** Add routes to `PROTECTED_ROUTES` array in `@src/middleware.ts`; unauthenticated requests are redirected to signin automatically.
 
 ## Project Structure
@@ -21,7 +22,7 @@ FitSpotApp is an Astro 7 full-stack SSR application for fitness class bookings, 
 
 ## Commands
 
-- `npm run dev` — Start dev server (Cloudflare workerd runtime).
+- `npm run dev` — Start dev server (Vite, localhost:4321 or 4322).
 - `npm run build` — Production build with SSR.
 - `npm run lint` — ESLint with strict type-checking.
 - `npm run lint:fix` — Auto-fix lint violations.
@@ -52,4 +53,4 @@ No test runner is currently configured. When adding tests, use Vitest (pairs wel
 
 ## Deployment & Secrets
 
-Build requires `SUPABASE_URL` and `SUPABASE_KEY` as environment variables (GitHub Actions CI gate checks both). Deployment: `npx wrangler deploy` (Cloudflare Workers, requires `wrangler` auth). Local Supabase: `npx supabase start` (Docker required).
+Build requires `SUPABASE_URL` and `SUPABASE_KEY` as environment variables. Deployment: `npx vercel deploy --prod` (Vercel, requires `vercel` CLI authenticated). Env vars set via `npx vercel env add`. Local Supabase: `npx supabase start` (Docker required).

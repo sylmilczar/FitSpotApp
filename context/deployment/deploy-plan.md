@@ -7,9 +7,10 @@
 
 ## Context
 
-- Codebase is wired for Cloudflare Workers (`@astrojs/cloudflare`, `wrangler.jsonc`)
-- Decision: follow `infrastructure.md` and deploy to Vercel
+- ~~Codebase is wired for Cloudflare Workers (`@astrojs/cloudflare`, `wrangler.jsonc`)~~ — migrated to Vercel
+- Decision: follow `infrastructure.md` and deploy to Vercel ✅
 - Strategy: test locally on `development` branch with `npx supabase start`, then merge to `main` for production
+- **Tailwind 4 gotcha:** uses `@tailwindcss/vite` Vite plugin + `@import "tailwindcss"` in CSS. Do NOT use `@tailwind` directives (v3 syntax) or `postcss.config.*` / `tailwind.config.*` files — they break CSS generation.
 
 ---
 
@@ -39,20 +40,21 @@
 9. Edit `astro.config.mjs`:
     - `import cloudflare from "@astrojs/cloudflare"` → `import vercel from "@astrojs/vercel"`
     - `adapter: cloudflare()` → `adapter: vercel()`
+    - Restore `vite: { plugins: [tailwindcss()] }` using `@tailwindcss/vite` (required for CSS generation)
 10. `npm uninstall @astrojs/cloudflare` — remove obsolete adapter
-11. Clean up unused Cloudflare config (optional but recommended):
+11. Clean up unused Cloudflare config:
     ```bash
     rm wrangler.jsonc
     ```
-12. `npm run build` — validate the build succeeds with new adapter
-13. Test the built app locally: `npm run preview`
+12. Ensure `src/styles/global.css` starts with `@import "tailwindcss"` (Tailwind 4 syntax — NOT `@tailwind` directives)
+13. `npm run build` — validate the build succeeds with new adapter
 14. Commit changes: `git add -A && git commit -m "feat: migrate from Cloudflare to Vercel adapter"`
 
 ---
 
-## Phase 2 — Merge & Production Supabase Setup (main branch) ⏳ IN PROGRESS
+## Phase 2 — Merge & Production Supabase Setup (main branch) ✅ COMPLETED
 
-**Status:** Ready to start
+**Status:** Completed on 2026-06-27 18:45 UTC
 
 15. `git checkout main && git merge development` — merge adapter changes to main
 16. Go to https://supabase.com → New project (separate from dev) → note **Project URL** and **Project Ref**
@@ -66,28 +68,36 @@
 
 ---
 
-## Phase 3 — Vercel Project Setup (main branch) ⬜ NOT STARTED
+## Phase 3 — Vercel Project Setup (main branch) ✅ COMPLETED
 
-19. `npx vercel login` — authenticate with Vercel account
-20. `npx vercel link` — links local project; creates `.vercel/project.json` (already in `.gitignore`)
-21. Set production secrets using the Supabase project created in Phase 2:
+**Status:** Completed on 2026-06-27 20:00 UTC
+
+19. ✅ `npx vercel login` — authenticate with Vercel account
+20. ✅ `npx vercel link` — creates project `fit-spot-app` under `sylmilczars-projects`; `.vercel/project.json` created (in `.gitignore`)
+21. ✅ Set production secrets via `npx vercel env add` (not `env set`):
     ```bash
-    npx vercel env set SUPABASE_URL "https://your-prod-project.supabase.co"
-    npx vercel env set SUPABASE_KEY "your-prod-anon-key"
+    npx vercel env add SUPABASE_URL   # → Production, Non-sensitive
+    npx vercel env add SUPABASE_KEY   # → Production, Sensitive
     ```
-22. `npx vercel env pull .env.local` — verify secrets are injected correctly
+    > **Note:** CLI uses `env add`, not `env set`. Environment must be selected with spacebar in the interactive prompt.
+22. ✅ `npx vercel env pull .env.local` pulls Development env vars (not Production — Production vars are injected at runtime by Vercel, not downloaded)
 
 ---
 
-## Phase 4 — Production Deploy (main branch) ⬜ NOT STARTED
+## Phase 4 — Production Deploy (main branch) ⏳ IN PROGRESS
 
-23. `npx vercel deploy` — deploys to a preview URL; manually test:
+**Status:** First deploy done, CSS fix committed, awaiting re-deploy
+
+23. ✅ `npx vercel deploy` — deployed to production URL: `https://fit-spot-app.vercel.app`
+    - ⚠️ CSS broken on first deploy (Tailwind 4 misconfiguration — see Context above)
+    - ✅ CSS fixed: restored `@tailwindcss/vite` plugin, reverted to `@import "tailwindcss"` syntax
+24. ⬜ Re-deploy after CSS fix: `git add -A && git commit -m "fix: ..." && npx vercel deploy --prod`
+25. ⬜ Test on production URL:
     - Sign-up flow
     - Sign-in flow
     - Dashboard (protected route — must redirect when unauthenticated)
     - Sign-out
-24. `npx vercel deploy --prod` — production deploy after preview verification passes
-25. Update Supabase **Site URL** to the production Vercel URL (**Authentication → URL Configuration**)
+26. ⬜ Update Supabase **Site URL** to `https://fit-spot-app.vercel.app` (**Authentication → URL Configuration**)
 
 ---
 
