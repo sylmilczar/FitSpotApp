@@ -84,19 +84,26 @@
 
 ---
 
-## Phase 4 — Production Deploy (main branch) ⏳ IN PROGRESS
+## Phase 4 — Production Deploy (main branch) ✅ COMPLETED
 
-**Status:** First deploy done, CSS fix committed, awaiting re-deploy
+**Status:** Fully deployed and verified (2026-06-27 20:30 UTC)
 
-23. ✅ `npx vercel deploy` — deployed to production URL: `https://fit-spot-app.vercel.app`
-    - ⚠️ CSS broken on first deploy (Tailwind 4 misconfiguration — see Context above)
-    - ✅ CSS fixed: restored `@tailwindcss/vite` plugin, reverted to `@import "tailwindcss"` syntax
-24. ⬜ Re-deploy after CSS fix: `git add -A && git commit -m "fix: ..." && npx vercel deploy --prod`
-25. ⬜ Test on production URL:
-    - Sign-up flow
-    - Sign-in flow
-    - Dashboard (protected route — must redirect when unauthenticated)
-    - Sign-out
+23. ✅ `npx vercel deploy` — deployed to production URL: `https://fit-spot-app.vercel.app` (CSS broken)
+    - ⚠️ CSS broken on first deploy (Tailwind 4 misconfiguration)
+    - ✅ CSS fixed locally
+24. ✅ Re-deploy after CSS fix: `git commit + npx vercel deploy --prod`
+    - ✅ Deployed successfully at `https://fit-spot-app.vercel.app`
+    - ✅ Aliased to production domain
+25. ✅ Test on production URL:
+    - ✅ Homepage loads with correct styling (gradient background, white text, card layouts)
+    - ✅ Sign-up flow works (creates user in production Supabase)
+    - ✅ Sign-in flow works (redirects to `/dashboard`)
+    - ✅ Dashboard is protected (unauthenticated redirects to `/auth/signin`)
+    - ✅ Sign-out works (returns to homepage)
+    - ⚠️ Note: Email confirmation was disabled in prod Supabase for MVP
+26. ✅ Update Supabase Site URL:
+    - ✅ Dashboard → Settings → Authentication → URL Configuration
+    - ✅ Site URL: `https://fit-spot-app.vercel.app` (updated from placeholder)
 26. ⬜ Update Supabase **Site URL** to `https://fit-spot-app.vercel.app` (**Authentication → URL Configuration**)
 
 ---
@@ -155,6 +162,42 @@ After verifying production is working:
 - Set up GitHub auto-deploy: `npx vercel git connect` — enables automatic deployments on push to `main` and preview URLs for PRs
 - Delete development branch: `git checkout main && git branch -d development` (after final verification)
 - Enable Supabase connection pooling if load testing shows connection pool exhaustion
+
+---
+
+## ✅ DEPLOYMENT SUMMARY
+
+**🎉 FIRST PRODUCTION DEPLOYMENT COMPLETE**
+
+| Phase | Status | Details |
+|-------|--------|---------|
+| Phase 0 — Local Dev | ✅ Complete | Local Supabase running, auth flow tested |
+| Phase 1 — Adapter Migration | ✅ Complete | Cloudflare → Vercel, Tailwind 4 configured |
+| Phase 2 — Production Supabase | ✅ Complete | Project created, migrations applied |
+| Phase 3 — Vercel Setup | ✅ Complete | Project linked, env vars configured |
+| Phase 4 — Deploy & Verify | ✅ Complete | Production live, all tests passing, Site URL updated |
+
+**Production URL:** https://fit-spot-app.vercel.app
+
+**All Tests Passing:**
+- ✅ Homepage: dark gradient, white text, proper layout
+- ✅ Sign-up: creates user in production Supabase
+- ✅ Sign-in: authenticates and redirects to `/dashboard`
+- ✅ Protected routes: `/dashboard` enforces authentication
+- ✅ Session: persists across page refresh
+- ✅ Sign-out: logs user out, returns to homepage
+
+**Key Decisions:**
+- Email confirmation disabled in production Supabase (removed friction for MVP)
+- Tailwind 4 Vite plugin restored and verified working
+- Vercel CLI account corrected (sylmilczar personal account)
+
+**Next Steps (Optional):**
+- GitHub auto-deploy: `npx vercel git connect`
+- Custom domain: via Vercel dashboard
+- Monitoring/analytics: post-launch
+
+**Ready for:** Feature development, user testing, marketing launch 🚀
 
 ---
 
