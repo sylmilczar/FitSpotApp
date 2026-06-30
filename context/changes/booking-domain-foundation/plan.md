@@ -36,6 +36,10 @@ Start with the booking schema and encode the domain in the database so later sli
 
 The reservation write path must be atomic; UI-side checks are not enough because the PRD guardrails are correctness rules, not just UX rules. The schema should stay minimal but future-aware, so reservations keep history through status transitions rather than disappearing on cancellation. Seed data is only for repeatable local verification, and it should stay small enough that it does not become a second feature.
 
+## UI Design Handoff Constraint
+
+Although this change does not implement UI, it must prepare a clean handoff for user-facing slices. S-02 and S-03 must implement screens using the visual system in `context/foundation/ui-design.md` (calm premium tone, olive accent hierarchy, accessibility states, and spacing rules). This foundation change therefore includes documenting how domain outcomes map to UI states without introducing UI code in this change.
+
 ## Decisions
 
 Canonical schema surface — downstream slice authors (S-02, S-03) should reference these names, not re-derive them from SQL:
@@ -125,6 +129,7 @@ Prove that the migration, seed, and contract work together and leave the foundat
 - Run a local database reset against the new schema and seed.
 - Add a targeted contract check: a SQL script (or Vitest test calling Supabase RPC via the local instance) that calls `create_reservation` and asserts all four cases: success, `CLASS_FULL`, `ALREADY_RESERVED`, and `CLASS_STARTED`.
 - Confirm that the resulting foundation is sufficient for S-02 and S-03 without additional schema work.
+- Add a handoff note for S-02/S-03 that maps booking outcomes (`ok`, `CLASS_FULL`, `ALREADY_RESERVED`, `CLASS_STARTED`) to UI states and requires visual implementation to follow `context/foundation/ui-design.md`.
 - Update the change metadata so the work is tracked as planned.
 
 ### Exit Criteria
@@ -132,6 +137,7 @@ Prove that the migration, seed, and contract work together and leave the foundat
 - Local reset succeeds with the new booking schema.
 - The booking contract passes its targeted check.
 - The foundation is ready for downstream planning and implementation.
+- The downstream handoff explicitly references `context/foundation/ui-design.md` and defines UI-state mappings for booking outcomes.
 
 ### Risks
 
@@ -174,3 +180,4 @@ Prove that the migration, seed, and contract work together and leave the foundat
 #### Manual
 
 - [ ] 3.3 Foundation confirmed sufficient for S-02 and S-03 without additional schema work
+- [ ] 3.4 Handoff note for S-02/S-03 includes UI-state mapping and `context/foundation/ui-design.md` reference
