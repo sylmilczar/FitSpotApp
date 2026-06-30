@@ -24,3 +24,18 @@ values
     now() - interval '1 hour'
   )
 on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- Local admin/manager promotion template
+-- ---------------------------------------------------------------------------
+-- After `supabase db reset`, create a user via Supabase Studio or CLI, then
+-- run one of the snippets below in the SQL Editor to promote them:
+--
+--   Promote to manager:
+--   UPDATE public.profiles SET role = 'manager'
+--   WHERE user_id = (SELECT id FROM auth.users WHERE email = 'your@email.com');
+--
+--   Promote to admin:
+--   UPDATE public.profiles SET role = 'admin'
+--   WHERE user_id = (SELECT id FROM auth.users WHERE email = 'your@email.com');
+-- ---------------------------------------------------------------------------

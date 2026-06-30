@@ -1,0 +1,1 @@
+select public.get_my_role();
