@@ -52,7 +52,7 @@ begin
 	end if;
 
 	if v_starts_at <= now() then
-		raise exception 'CLASS_STARTED';
+		raise exception using message = 'CLASS_STARTED', errcode = 'P0001', detail = 'CLASS_STARTED';
 	end if;
 
 	if exists (
@@ -62,7 +62,7 @@ begin
 			and r.user_id = p_user_id
 			and r.status = 'confirmed'
 	) then
-		raise exception 'ALREADY_RESERVED';
+		raise exception using message = 'ALREADY_RESERVED', errcode = 'P0001', detail = 'ALREADY_RESERVED';
 	end if;
 
 	select count(*)
@@ -72,7 +72,7 @@ begin
 		and r.status = 'confirmed';
 
 	if v_confirmed_count >= v_capacity then
-		raise exception 'CLASS_FULL';
+		raise exception using message = 'CLASS_FULL', errcode = 'P0001', detail = 'CLASS_FULL';
 	end if;
 
 	insert into public.reservations (class_id, user_id, status)

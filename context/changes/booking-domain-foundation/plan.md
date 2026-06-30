@@ -152,24 +152,23 @@ Prove that the migration, seed, and contract work together and leave the foundat
 
 #### Automated
 
-- [ ] 1.1 Migration file created in supabase/migrations/
-- [x] 1.1 Migration file created in supabase/migrations/
-- [x] 1.2 supabase db reset succeeds with booking schema
+- [x] 1.1 Migration file created in supabase/migrations/ — 4d334aa
+- [x] 1.2 supabase db reset succeeds with booking schema — 4d334aa
 
 #### Manual
 
-- [x] 1.3 Seed fixture loads during local reset
+- [x] 1.3 Seed fixture loads during local reset — 4d334aa
 
 ### Phase 2: Implement the booking contract
 
 #### Automated
 
-- [ ] 2.1 Single booking contract enforces all three guardrails
-- [ ] 2.2 Contract returns typed success/failure outcomes for each guardrail
+- [x] 2.1 Single booking contract enforces all three guardrails
+- [x] 2.2 Contract returns typed success/failure outcomes for each guardrail
 
 #### Manual
 
-- [ ] 2.3 No booking logic duplicated — S-02/S-03 can import the contract directly
+- [x] 2.3 No booking logic duplicated — S-02/S-03 can import the contract directly
 
 ### Phase 3: Verify and hand off
 
