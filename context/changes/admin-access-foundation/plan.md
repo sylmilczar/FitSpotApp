@@ -296,17 +296,17 @@ The `create_reservation()` function is `SECURITY DEFINER` and bypasses RLS for i
 
 #### Automated
 
-- [ ] 2.1 supabase db reset succeeds with RLS migration applied
-- [ ] 2.2 RLS enabled on classes table
-- [ ] 2.3 RLS enabled on reservations table
+- [x] 2.1 supabase db reset succeeds with RLS migration applied
+- [x] 2.2 RLS enabled on classes table
+- [x] 2.3 RLS enabled on reservations table
 
 #### Manual
 
-- [ ] 2.4 Anon SELECT on classes returns rows
-- [ ] 2.5 Client SELECT on reservations returns only own rows
-- [ ] 2.6 Manager or admin SELECT on reservations returns all rows
-- [ ] 2.7 Client INSERT on classes is rejected by RLS
-- [ ] 2.8 anon no longer has EXECUTE on create_reservation
+- [x] 2.4 Anon SELECT on classes returns rows
+- [x] 2.5 Client SELECT on reservations returns only own rows
+- [x] 2.6 Manager or admin SELECT on reservations returns all rows
+- [x] 2.7 Client INSERT on classes is rejected by RLS
+- [x] 2.8 anon no longer has EXECUTE on create_reservation
 
 ### Phase 3: Application layer
 

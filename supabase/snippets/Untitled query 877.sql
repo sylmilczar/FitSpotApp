@@ -1,1 +1,1 @@
-select public.get_my_role();
+select has_function_privilege('anon', 'public.create_reservation(uuid, uuid)', 'EXECUTE');
