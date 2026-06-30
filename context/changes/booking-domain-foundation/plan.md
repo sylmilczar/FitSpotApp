@@ -174,10 +174,10 @@ Prove that the migration, seed, and contract work together and leave the foundat
 
 #### Automated
 
-- [x] 3.1 Local db reset succeeds with new booking schema
-- [x] 3.2 Targeted contract check passes
+- [x] 3.1 Local db reset succeeds with new booking schema — efaea26
+- [x] 3.2 Targeted contract check passes — efaea26
 
 #### Manual
 
-- [x] 3.3 Foundation confirmed sufficient for S-02 and S-03 without additional schema work
-- [x] 3.4 Handoff note for S-02/S-03 includes UI-state mapping and `context/foundation/ui-design.md` reference
+- [x] 3.3 Foundation confirmed sufficient for S-02 and S-03 without additional schema work — efaea26
+- [x] 3.4 Handoff note for S-02/S-03 includes UI-state mapping and `context/foundation/ui-design.md` reference — efaea26
