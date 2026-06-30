@@ -283,14 +283,14 @@ The `create_reservation()` function is `SECURITY DEFINER` and bypasses RLS for i
 
 #### Automated
 
-- [x] 1.1 Migration creates profiles table and trigger: supabase db reset succeeds
-- [x] 1.2 get_my_role() function exists in schema
-- [x] 1.3 TypeScript compiles with new AppRole type
+- [x] 1.1 Migration creates profiles table and trigger: supabase db reset succeeds — db41868
+- [x] 1.2 get_my_role() function exists in schema — db41868
+- [x] 1.3 TypeScript compiles with new AppRole type — db41868
 
 #### Manual
 
-- [x] 1.4 Trigger auto-creates client profile row on new user creation
-- [x] 1.5 select * from public.profiles shows seeded row
+- [x] 1.4 Trigger auto-creates client profile row on new user creation — db41868
+- [x] 1.5 select * from public.profiles shows seeded row — db41868
 
 ### Phase 2: RLS policies
 
