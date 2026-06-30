@@ -6,7 +6,7 @@ We are building the minimal booking-domain foundation that future slices can con
 
 ## Current State Analysis
 
-Auth and SSR are already in place, so this plan can assume cookie-based Supabase sessions and route protection from `src/lib/supabase.ts` and `src/middleware.ts`. The booking domain itself is absent: there are no classes, reservations, attendee, or availability tables or services yet, and the only API routes in `src/pages/api/` are auth handlers. Supabase migrations are enabled in `supabase/config.toml`, but no schema paths or seed file are wired, which means the data layer is ready for first migration work but not yet shaped for booking.
+Auth and SSR are already in place, so this plan can assume cookie-based Supabase sessions and route protection from `src/lib/supabase.ts` and `src/middleware.ts`. The booking domain itself is absent: there are no classes, reservations, attendee, or availability tables or services yet, and the only API routes in `src/pages/api/` are auth handlers. Supabase migrations are enabled in `supabase/config.toml`; `schema_paths` is currently empty while `db.seed.sql_paths` is already wired to `./seed.sql`, so the data layer is ready for first migration work and only the actual `supabase/seed.sql` file is missing.
 
 ## Desired End State
 
