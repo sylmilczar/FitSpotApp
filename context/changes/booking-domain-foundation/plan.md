@@ -163,21 +163,21 @@ Prove that the migration, seed, and contract work together and leave the foundat
 
 #### Automated
 
-- [x] 2.1 Single booking contract enforces all three guardrails
-- [x] 2.2 Contract returns typed success/failure outcomes for each guardrail
+- [x] 2.1 Single booking contract enforces all three guardrails — 5997027
+- [x] 2.2 Contract returns typed success/failure outcomes for each guardrail — 5997027
 
 #### Manual
 
-- [x] 2.3 No booking logic duplicated — S-02/S-03 can import the contract directly
+- [x] 2.3 No booking logic duplicated — S-02/S-03 can import the contract directly — 5997027
 
 ### Phase 3: Verify and hand off
 
 #### Automated
 
-- [ ] 3.1 Local db reset succeeds with new booking schema
-- [ ] 3.2 Targeted contract check passes
+- [x] 3.1 Local db reset succeeds with new booking schema
+- [x] 3.2 Targeted contract check passes
 
 #### Manual
 
-- [ ] 3.3 Foundation confirmed sufficient for S-02 and S-03 without additional schema work
-- [ ] 3.4 Handoff note for S-02/S-03 includes UI-state mapping and `context/foundation/ui-design.md` reference
+- [x] 3.3 Foundation confirmed sufficient for S-02 and S-03 without additional schema work
+- [x] 3.4 Handoff note for S-02/S-03 includes UI-state mapping and `context/foundation/ui-design.md` reference
