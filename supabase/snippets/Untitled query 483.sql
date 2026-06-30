@@ -1,0 +1,1 @@
+select id, name, capacity from public.classes order by id;

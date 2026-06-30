@@ -153,11 +153,12 @@ Prove that the migration, seed, and contract work together and leave the foundat
 #### Automated
 
 - [ ] 1.1 Migration file created in supabase/migrations/
-- [ ] 1.2 supabase db reset succeeds with booking schema
+- [x] 1.1 Migration file created in supabase/migrations/
+- [x] 1.2 supabase db reset succeeds with booking schema
 
 #### Manual
 
-- [ ] 1.3 Seed fixture loads during local reset
+- [x] 1.3 Seed fixture loads during local reset
 
 ### Phase 2: Implement the booking contract
 
