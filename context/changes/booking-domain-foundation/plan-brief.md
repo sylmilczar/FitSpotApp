@@ -12,11 +12,11 @@ Create the minimal booking-domain foundation that future slices can reuse safely
 1. Add the booking schema and constraints.
 2. Implement a reusable PostgreSQL `create_reservation` contract exposed via Supabase RPC that enforces capacity, duplicate, and start-time rules atomically.
 3. Add a minimal seed fixture and a targeted verification loop.
-4. Defer booking-table RLS policies to a follow-up migration after F-02 defines admin-role policy shape.
+4. Defer booking-table RLS policies to a follow-up migration after F-02 defines role-based policy shape (client/manager/admin).
 
 ## Out of Scope
 - Booking UI.
-- Admin flows.
+- Manager/admin flows.
 - Cancellation implementation for FR-006.
 - Deploy, infra, or observability work.
 

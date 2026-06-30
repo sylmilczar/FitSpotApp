@@ -83,10 +83,15 @@ Primary persona: client of a single fitness club who wants to discover classes, 
 
 ### Class Management
 
-- FR-008: Administrator can create, edit, and delete classes and set participant limits. Priority: must-have
+- FR-008: Manager or Admin can create, edit, and delete classes and set participant limits. Priority: must-have
   > Socrates: Counter-argument considered: "only create/edit may be enough and delete could wait." Resolution: kept; full schedule management remains in scope for operational completeness.
-- FR-009: Administrator can view class attendees. Priority: must-have
+- FR-009: Manager or Admin can view class attendees. Priority: must-have
   > Socrates: Counter-argument considered: "occupancy count only may be enough for first release." Resolution: kept; attendee visibility is required for class operations.
+
+### User Management
+
+- FR-010: Admin can manage users and assign roles (Client or Manager). Priority: should-have
+  > Socrates: Counter-argument considered: "manual role updates in Supabase dashboard may be enough for MVP." Resolution: kept; role management in-app is needed to avoid operational bottlenecks and reduce privileged manual DB access.
 
 ## Non-Functional Requirements
 
@@ -108,12 +113,14 @@ User sees: decision at the booking page when attempting to reserve a spot.
 
 - Authentication: email + password login for registered accounts.
 - Roles:
-  - Guest: can view upcoming classes and class details, but cannot reserve.
+  - Guest: can view upcoming classes and class details, but cannot reserve (no authenticated session).
   - Client: can reserve and cancel reservations, and view upcoming reservations.
-  - Administrator: can create, edit, and delete classes, set participant limits, and view attendees.
+  - Manager: can create, edit, and delete classes, set participant limits, and view attendees.
+  - Admin: can manage users and has all Manager permissions.
 - Route behavior:
   - Reservation actions require authenticated Client role.
-  - Class management routes require Administrator role.
+  - Class management routes require Manager or Admin role.
+  - User management routes require Admin role.
   - Unauthenticated users trying to reserve are redirected to login/registration.
 
 ## Non-Goals

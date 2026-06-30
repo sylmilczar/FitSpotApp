@@ -3,7 +3,7 @@ project: FitSpotApp for a Small Fitness Club
 version: 1
 status: draft
 created: 2026-06-29
-updated: 2026-06-29
+updated: 2026-06-30
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -30,11 +30,12 @@ W obecnym stanie rezerwacje zajec sa rozproszone miedzy telefon i komunikatory, 
 | ID | Change ID | Outcome (user can ...) | Prerequisites | PRD refs | Status |
 |---|---|---|---|---|---|
 | F-01 | booking-domain-foundation | (foundation) minimalny kontrakt domeny rezerwacji i dostepnosci jest gotowy pod flow klienta | — | FR-003, FR-004, FR-005, FR-007, Business Logic, Non-Functional Requirements | ready |
-| F-02 | admin-access-foundation | (foundation) minimalny kontrakt uprawnien i operacji administracyjnych jest gotowy | — | Access Control, FR-008, FR-009 | ready |
+| F-02 | admin-access-foundation | (foundation) minimalny kontrakt uprawnien dla roli client/manager/admin jest gotowy | — | Access Control, FR-008, FR-009, FR-010 | ready |
 | S-01 | client-auth-journey | user can create an account and sign in to enter protected booking flow | — | FR-001, FR-002 | ready |
 | S-02 | reserve-class-with-guardrails | user can reserve an eligible class and see it in upcoming reservations with spot updates | S-01, S-03, F-01, F-02 | US-01, FR-005, FR-007, Non-Functional Requirements | proposed |
 | S-03 | browse-classes-with-availability | user can browse upcoming classes and view available spots in class details | F-01 | FR-003, FR-004 | proposed |
-| S-04 | admin-manage-classes-and-attendees | administrator can manage classes and view class attendees | S-01, F-01, F-02 | FR-008, FR-009 | proposed |
+| S-04 | manager-manage-classes-and-attendees | manager (and admin as superset) can manage classes and view class attendees | S-01, F-01, F-02 | FR-008, FR-009 | proposed |
+| S-05 | admin-manage-users-and-roles | admin can manage users and assign roles for operations | S-01, F-02 | FR-010, Access Control | proposed |
 
 ## Streams
 
@@ -43,7 +44,7 @@ Navigation aid - groups items that share a Prerequisites chain. Canonical orderi
 | Stream | Theme | Chain | Note |
 |---|---|---|---|
 | A | Booking value stream | F-01 -> S-03 -> S-02 | Priorytet dla speed: jak najszybciej domknac flow rezerwacji, ktory waliduje wartosc MVP. |
-| B | Access and authorization | F-02 -> S-01 | Stabilizuje granice roli klient/admin, zeby dalsze slice nie blokowaly sie na uprawnieniach. |
+| B | Access and authorization | F-02 -> S-01 -> S-05 | Stabilizuje granice roli client/manager/admin i domyka administrowanie uzytkownikami bez recznych zmian w bazie. |
 | C | Club operations | S-04 | Korzysta z fundamentow i auth, domyka operacyjna strone produktu po walidacji flow klienta. |
 
 ## Baseline
@@ -75,10 +76,10 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ### F-02: Kontrakt operacji administracyjnych i uprawnien
 
-- **Outcome:** (foundation) reguly dostepu dla roli administratora i klienta sa gotowe dla operacji rezerwacji i zarzadzania grafikiem.
+- **Outcome:** (foundation) reguly dostepu dla roli client/manager/admin sa gotowe dla operacji rezerwacji, zarzadzania grafikiem i zarzadzania uzytkownikami.
 - **Change ID:** admin-access-foundation
-- **PRD refs:** Access Control, FR-008, FR-009
-- **Unlocks:** S-02, S-04
+- **PRD refs:** Access Control, FR-008, FR-009, FR-010
+- **Unlocks:** S-02, S-04, S-05
 - **Prerequisites:** —
 - **Parallel with:** F-01, S-01
 - **Blockers:** —
@@ -124,16 +125,28 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** To glowna walidacja produktu; odkladanie jej utrzymuje najwyzsze ryzyko bez nauki z realnego przeplywu.
 - **Status:** proposed
 
-### S-04: Zarzadzanie zajeciami i uczestnikami przez administratora
+### S-04: Zarzadzanie zajeciami i uczestnikami przez managera
 
-- **Outcome:** administrator can manage classes and view class attendees.
-- **Change ID:** admin-manage-classes-and-attendees
+- **Outcome:** manager (and admin as superset) can manage classes and view class attendees.
+- **Change ID:** manager-manage-classes-and-attendees
 - **PRD refs:** FR-008, FR-009
 - **Prerequisites:** S-01, F-01, F-02
-- **Parallel with:** S-02
+- **Parallel with:** S-02, S-05
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** Zbyt wczesne rozszerzenie na operacje admina moze spowolnic domkniecie krytycznej sciezki klienta.
+- **Risk:** Zbyt wczesne rozszerzenie na operacje managerskie moze spowolnic domkniecie krytycznej sciezki klienta.
+- **Status:** proposed
+
+### S-05: Zarzadzanie uzytkownikami i rolami przez admina
+
+- **Outcome:** admin can manage users and assign roles for operations.
+- **Change ID:** admin-manage-users-and-roles
+- **PRD refs:** FR-010, Access Control
+- **Prerequisites:** S-01, F-02
+- **Parallel with:** S-04
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Bez tego kroku role manager/admin beda wymagaly recznej obslugi w bazie, co podnosi ryzyko operacyjne i opoznia zmiany organizacyjne.
 - **Status:** proposed
 
 ## Backlog Handoff
@@ -141,11 +154,12 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | Roadmap ID | Change ID | Suggested issue title | Ready for /10x-plan | Notes |
 |---|---|---|---|---|
 | F-01 | booking-domain-foundation | Foundation: booking domain contract and availability consistency | yes | Odblokowuje S-03 i S-02. |
-| F-02 | admin-access-foundation | Foundation: role access and admin operations contract | yes | Odblokowuje S-02 i S-04 od strony uprawnien. |
+| F-02 | admin-access-foundation | Foundation: role access contract for client/manager/admin | yes | Odblokowuje S-02, S-04 i S-05 od strony uprawnien. |
 | S-01 | client-auth-journey | Client can sign up and sign in for protected booking flow | yes | Rownolegly szybki tor. |
 | S-03 | browse-classes-with-availability | Client can browse classes with availability | no | Wymaga F-01. |
 | S-02 | reserve-class-with-guardrails | Client can reserve class and see upcoming reservation | no | North star; wymaga S-01, S-03, F-01, F-02. |
-| S-04 | admin-manage-classes-and-attendees | Admin can manage classes and attendees | no | Wymaga S-01, F-01, F-02. |
+| S-04 | manager-manage-classes-and-attendees | Manager can manage classes and attendees | no | Wymaga S-01, F-01, F-02. |
+| S-05 | admin-manage-users-and-roles | Admin can manage users and assign roles | no | Wymaga S-01 i F-02. |
 
 This table is the clean handoff to Jira/Linear or any MCP-backed backlog. Include one row for every F-NN and S-NN. It should be compact enough to copy into issues, but it must not duplicate the detailed roadmap body.
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-We are building the minimal booking-domain foundation that future slices can consume without inventing their own data model or booking rules. The foundation will add the core booking schema, a status-based reservation model, atomic guardrails for capacity and duplicate prevention, a minimal seed fixture for local verification, and a narrow verification path. It will not add any booking UI or admin workflows yet.
+We are building the minimal booking-domain foundation that future slices can consume without inventing their own data model or booking rules. The foundation will add the core booking schema, a status-based reservation model, atomic guardrails for capacity and duplicate prevention, a minimal seed fixture for local verification, and a narrow verification path. It will not add any booking UI or manager/admin workflows yet.
 
 ## Current State Analysis
 
@@ -22,11 +22,11 @@ After this plan lands, the repository will have a versioned booking schema for c
 ## What We're NOT Doing
 
 - Booking UI, class browsing pages, or any client-facing reservation screens.
-- Admin class management and attendee views.
+- Manager/admin class management and attendee views.
 - Cancellation flow FR-006 beyond leaving the schema ready for it later.
 - Payments, memberships, or other non-goal scope.
 - Deploy, infra, or observability changes.
-- RLS policies for booking tables — explicitly deferred to a dedicated migration once F-02 (admin-access-foundation) lands, because admin-role policies depend on F-02's role column shape. A follow-up migration must add RLS before any booking tables are promoted to production.
+- RLS policies for booking tables — explicitly deferred to a dedicated migration once F-02 (admin-access-foundation) lands, because role-based policies (client/manager/admin) depend on F-02's role column shape. A follow-up migration must add RLS before any booking tables are promoted to production.
 
 ## Implementation Approach
 
