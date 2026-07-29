@@ -7,6 +7,20 @@ const signInSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+function getSignInValidationMessage(error: z.ZodError): string {
+  const firstIssue = error.issues[0];
+
+  if (firstIssue.path[0] === "email") {
+    return "Enter a valid email address.";
+  }
+
+  if (firstIssue.path[0] === "password") {
+    return "Password is required.";
+  }
+
+  return "Please check your sign in details and try again.";
+}
+
 export const POST: APIRoute = async (context) => {
   const form = await context.request.formData();
   const parsed = signInSchema.safeParse({
@@ -15,7 +29,7 @@ export const POST: APIRoute = async (context) => {
   });
 
   if (!parsed.success) {
-    const message = parsed.error.issues[0]?.message ?? "Invalid signin payload";
+    const message = getSignInValidationMessage(parsed.error);
     return context.redirect(`/auth/signin?error=${encodeURIComponent(message)}`);
   }
 

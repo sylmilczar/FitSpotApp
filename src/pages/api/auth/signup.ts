@@ -13,6 +13,28 @@ const signUpSchema = z
     path: ["confirmPassword"],
   });
 
+function getSignUpValidationMessage(error: z.ZodError): string {
+  const firstIssue = error.issues[0];
+
+  if (firstIssue.path[0] === "email") {
+    return "Enter a valid email address.";
+  }
+
+  if (firstIssue.path[0] === "password") {
+    return "Password must be at least 6 characters.";
+  }
+
+  if (firstIssue.path[0] === "confirmPassword") {
+    if (firstIssue.message.toLowerCase().includes("match")) {
+      return "Passwords do not match.";
+    }
+
+    return "Please confirm your password.";
+  }
+
+  return "Please check your sign up details and try again.";
+}
+
 export const POST: APIRoute = async (context) => {
   const form = await context.request.formData();
   const parsed = signUpSchema.safeParse({
@@ -22,7 +44,7 @@ export const POST: APIRoute = async (context) => {
   });
 
   if (!parsed.success) {
-    const message = parsed.error.issues[0]?.message ?? "Invalid signup payload";
+    const message = getSignUpValidationMessage(parsed.error);
     return context.redirect(`/auth/signup?error=${encodeURIComponent(message)}`);
   }
 
