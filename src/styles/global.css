@@ -114,6 +114,12 @@
   background-image: linear-gradient(to bottom, #0a0e1a, #0f1529, #0a0e1a);
 }
 
+@utility bg-wellness {
+  background-color: #f8f8f5;
+  background-image: radial-gradient(circle at 20% 20%, #d9deb8 0%, transparent 40%),
+    radial-gradient(circle at 80% 0%, #ffffff 0%, transparent 35%);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
