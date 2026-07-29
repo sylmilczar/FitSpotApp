@@ -31,9 +31,10 @@ W obecnym stanie rezerwacje zajec sa rozproszone miedzy telefon i komunikatory, 
 |---|---|---|---|---|---|
 | F-01 | booking-domain-foundation | (foundation) minimalny kontrakt domeny rezerwacji i dostepnosci jest gotowy pod flow klienta | — | FR-003, FR-004, FR-005, FR-007, Business Logic, Non-Functional Requirements | ready |
 | F-02 | admin-access-foundation | (foundation) minimalny kontrakt uprawnien dla roli client/manager/admin jest gotowy | — | Access Control, FR-008, FR-009, FR-010 | done |
+| F-03 | app-routing-foundation | (foundation) user niezalogowany trafia na publiczna strone glowna i moze przejsc do auth lub grafiku zajec; dashboard nie jest czescia glownego flow | S-01 | FR-001, FR-002, FR-003 | proposed |
 | S-01 | client-auth-journey | user can create an account and sign in to enter protected booking flow | — | FR-001, FR-002 | done |
 | S-02 | reserve-class-with-guardrails | user can reserve an eligible class and see it in upcoming reservations with spot updates | S-01, S-03, F-01, F-02 | US-01, FR-005, FR-007, Non-Functional Requirements | proposed |
-| S-03 | browse-classes-with-availability | user can browse upcoming classes and view available spots in class details | F-01 | FR-003, FR-004 | proposed |
+| S-03 | browse-classes-with-availability | user can browse upcoming classes and view available spots in class details | F-01, F-03 | FR-003, FR-004 | proposed |
 | S-04 | manager-manage-classes-and-attendees | manager (and admin as superset) can manage classes and view class attendees | S-01, F-01, F-02 | FR-008, FR-009 | proposed |
 | S-05 | admin-manage-users-and-roles | admin can manage users and assign roles for operations | S-01, F-02 | FR-010, Access Control | proposed |
 
@@ -43,9 +44,10 @@ Navigation aid - groups items that share a Prerequisites chain. Canonical orderi
 
 | Stream | Theme | Chain | Note |
 |---|---|---|---|
-| A | Booking value stream | F-01 -> S-03 -> S-02 | Priorytet dla speed: jak najszybciej domknac flow rezerwacji, ktory waliduje wartosc MVP. |
+| A | Booking value stream | F-01 -> F-03 -> S-03 -> S-02 | Priorytet dla speed: jak najszybciej domknac flow rezerwacji, ktory waliduje wartosc MVP. |
 | B | Access and authorization | F-02 -> S-01 -> S-05 | Stabilizuje granice roli client/manager/admin i domyka administrowanie uzytkownikami bez recznych zmian w bazie. |
 | C | Club operations | S-04 | Korzysta z fundamentow i auth, domyka operacyjna strone produktu po walidacji flow klienta. |
+| D | Entry and navigation | S-01 -> F-03 | Domyka docelowy routing MVP: `/` jako publiczna strona glowna, przejscie do auth i `/classes`, bez zaleznosci od `/dashboard`. |
 
 ## Baseline
 
@@ -87,6 +89,19 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** Bez jasnych granic rol latwo o regresje bezpieczenstwa przy pracy pod presja czasu.
 - **Status:** done
 
+### F-03: Kontrakt routingu aplikacji i publicznego wejscia
+
+- **Outcome:** (foundation) routing MVP jest spojny: niezalogowany user na `/` widzi publiczna strone glowna (kim jestesmy/kontakt), z niej moze przejsc do logowania/rejestracji lub do `/classes`; `/dashboard` nie jest wymaganym elementem glownego flow.
+- **Change ID:** app-routing-foundation
+- **PRD refs:** FR-001, FR-002, FR-003
+- **Unlocks:** S-03, S-02
+- **Prerequisites:** S-01
+- **Parallel with:** F-01
+- **Blockers:** —
+- **Unknowns:** Czy po zalogowaniu domyslny redirect powinien isc na `/classes` czy pozostac konfigurowalny.
+- **Risk:** Bez tego foundation user journey pozostaje niespojny, a MVP traci czytelny entry-point.
+- **Status:** proposed
+
 ## Slices
 
 ### S-01: Podstawowa sciezka konta klienta
@@ -106,7 +121,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Outcome:** user can browse upcoming classes and view available spots in class details.
 - **Change ID:** browse-classes-with-availability
 - **PRD refs:** FR-003, FR-004
-- **Prerequisites:** F-01
+- **Prerequisites:** F-01, F-03
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:** —
@@ -118,7 +133,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Outcome:** user can reserve an eligible class and see it in upcoming reservations with spot updates.
 - **Change ID:** reserve-class-with-guardrails
 - **PRD refs:** US-01, FR-005, FR-007, Non-Functional Requirements
-- **Prerequisites:** S-01, S-03, F-01, F-02
+- **Prerequisites:** S-01, S-03, F-01, F-02, F-03
 - **Parallel with:** S-04
 - **Blockers:** —
 - **Unknowns:** —
@@ -155,9 +170,10 @@ Foundations below assume these are present and do NOT re-scaffold them.
 |---|---|---|---|---|
 | F-01 | booking-domain-foundation | Foundation: booking domain contract and availability consistency | yes | Odblokowuje S-03 i S-02. |
 | F-02 | admin-access-foundation | Foundation: role access contract for client/manager/admin | yes | Odblokowuje S-02, S-04 i S-05 od strony uprawnien. |
+| F-03 | app-routing-foundation | Foundation: public home entrypoint and coherent app routing without dashboard dependency | yes | Spina glowny user flow: `/` -> auth lub `/classes`. |
 | S-01 | client-auth-journey | Client can sign up and sign in for protected booking flow | yes | Rownolegly szybki tor. |
-| S-03 | browse-classes-with-availability | Client can browse classes with availability | no | Wymaga F-01. |
-| S-02 | reserve-class-with-guardrails | Client can reserve class and see upcoming reservation | no | North star; wymaga S-01, S-03, F-01, F-02. |
+| S-03 | browse-classes-with-availability | Client can browse classes with availability | no | Wymaga F-01 i F-03. |
+| S-02 | reserve-class-with-guardrails | Client can reserve class and see upcoming reservation | no | North star; wymaga S-01, S-03, F-01, F-02 i F-03. |
 | S-04 | manager-manage-classes-and-attendees | Manager can manage classes and attendees | no | Wymaga S-01, F-01, F-02. |
 | S-05 | admin-manage-users-and-roles | Admin can manage users and assign roles | no | Wymaga S-01 i F-02. |
 
