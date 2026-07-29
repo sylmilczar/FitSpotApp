@@ -1,10 +1,10 @@
 ---
 change_id: browse-classes-with-availability
 title: Browse classes with availability
-status: implemented
+status: archived
 created: 2026-07-29
 updated: 2026-07-29
-archived_at: null
+archived_at: 2026-07-29T16:46:55Z
 ---
 
 ## Notes
