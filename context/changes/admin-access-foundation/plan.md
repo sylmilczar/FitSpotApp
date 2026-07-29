@@ -332,6 +332,6 @@ The `create_reservation()` function is `SECURITY DEFINER` and bypasses RLS for i
 
 #### Manual
 
-- [ ] 4.4 Full admin access flow verified end-to-end
-- [ ] 4.5 Client access flow verified end-to-end
+- [x] 4.4 Full admin access flow verified end-to-end
+- [x] 4.5 Client access flow verified end-to-end
 - [x] 4.6 Handoff note covers S-04 contract and references ui-design.md — 003b7ae
