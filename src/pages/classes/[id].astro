@@ -1,0 +1,100 @@
+---
+import ClassStatusBadge from "@/components/classes/ClassStatusBadge.astro";
+import { getClassDetailsById } from "@/lib/classes.handler";
+import Layout from "@/layouts/Layout.astro";
+
+const classId = Astro.params.id ?? "";
+const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(classId);
+
+const result = isUuid
+  ? await getClassDetailsById(classId)
+  : { ok: false as const, reason: "not_found" as const, message: "Class not found" };
+
+if (!result.ok && result.reason === "not_found") {
+  Astro.response.status = 404;
+}
+
+const classItem = result.ok ? result.data : null;
+const startsAt = classItem ? new Date(classItem.startsAt) : null;
+const isStarted = startsAt ? startsAt.getTime() <= Date.now() : false;
+
+const dateLabel = startsAt
+  ? new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(startsAt)
+  : "";
+---
+
+<Layout title={classItem ? classItem.name : "Class details"}>
+  <main class="bg-wellness min-h-screen px-4 py-10 sm:px-6">
+    <section class="mx-auto max-w-3xl">
+      <a
+        href="/classes"
+        class="mb-6 inline-flex text-sm font-medium text-[#4F5A37] hover:text-[#97A354] hover:underline"
+      >
+        Back to classes
+      </a>
+
+      {
+        classItem ? (
+          <article class="rounded-2xl border border-[#E6E6DD] bg-[#FFFFFF] p-8 shadow-[0_10px_24px_rgba(79,90,55,0.08)]">
+            <div class="mb-4 flex items-start justify-between gap-4">
+              <h1 class="text-3xl font-bold text-[#1F1F1A]">{classItem.name}</h1>
+              <ClassStatusBadge availabilityStatus={classItem.isFull ? "full" : "available"} />
+            </div>
+
+            <p class="text-sm text-[#67675F]">{dateLabel}</p>
+            <p class="mt-4 text-base leading-7 text-[#67675F]">
+              {classItem.description ?? "Class description is coming soon."}
+            </p>
+
+            <dl class="mt-8 grid gap-4 rounded-2xl border border-[#E6E6DD] bg-[#F8F8F5] p-5 sm:grid-cols-3">
+              <div>
+                <dt class="text-xs font-semibold tracking-wide text-[#67675F] uppercase">Available spots</dt>
+                <dd class="mt-2 text-2xl font-semibold text-[#1F1F1A]">{classItem.availableSpots}</dd>
+              </div>
+              <div>
+                <dt class="text-xs font-semibold tracking-wide text-[#67675F] uppercase">Confirmed</dt>
+                <dd class="mt-2 text-2xl font-semibold text-[#1F1F1A]">{classItem.confirmedReservationsCount}</dd>
+              </div>
+              <div>
+                <dt class="text-xs font-semibold tracking-wide text-[#67675F] uppercase">Capacity</dt>
+                <dd class="mt-2 text-2xl font-semibold text-[#1F1F1A]">{classItem.capacity}</dd>
+              </div>
+            </dl>
+
+            {isStarted ? (
+              <p class="mt-6 rounded-2xl border border-[#C95B5B]/30 bg-[#C95B5B]/10 px-4 py-3 text-sm font-medium text-[#8E4040]">
+                This class has already started, so booking is currently unavailable.
+              </p>
+            ) : classItem.isFull ? (
+              <p class="mt-6 rounded-2xl border border-[#D7A441]/30 bg-[#D7A441]/15 px-4 py-3 text-sm font-medium text-[#7A5A1F]">
+                This class is currently full. Try another upcoming session.
+              </p>
+            ) : (
+              <p class="mt-6 rounded-2xl border border-[#D9DEB8] bg-[#D9DEB8]/35 px-4 py-3 text-sm font-medium text-[#4F5A37]">
+                Spots are available for this class.
+              </p>
+            )}
+          </article>
+        ) : result.reason === "not_found" ? (
+          <section class="rounded-2xl border border-[#E6E6DD] bg-[#FFFFFF] p-8 text-center">
+            <h1 class="text-2xl font-bold text-[#1F1F1A]">Class not found</h1>
+            <p class="mt-3 text-sm text-[#67675F]">
+              The class you are looking for does not exist or is no longer available.
+            </p>
+          </section>
+        ) : (
+          <section class="rounded-2xl border border-[#C95B5B]/30 bg-[#FFFFFF] p-8 text-center text-[#C95B5B]">
+            <h1 class="text-2xl font-bold">Could not load this class</h1>
+            <p class="mt-3 text-sm">Please try again in a moment.</p>
+          </section>
+        )
+      }
+    </section>
+  </main>
+</Layout>

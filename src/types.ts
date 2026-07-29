@@ -13,3 +13,16 @@ export interface BookingContractFailure {
 }
 
 export type BookingContractResult = BookingContractSuccess | BookingContractFailure;
+
+export interface ClassListItem {
+  id: string;
+  name: string;
+  description: string | null;
+  capacity: number;
+  startsAt: string;
+  confirmedReservationsCount: number;
+  availableSpots: number;
+  isFull: boolean;
+}
+
+export type ClassDetailsView = ClassListItem;

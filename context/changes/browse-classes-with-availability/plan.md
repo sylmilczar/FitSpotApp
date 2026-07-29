@@ -120,8 +120,8 @@ Use server-side rendering and keep behavior read-only.
 
 #### Automated
 
-- [ ] 1.1 TypeScript compiles (`npx tsc --noEmit`)
-- [ ] 1.2 Lint passes (`npm run lint`)
+- [x] 1.1 TypeScript compiles (`npx tsc --noEmit`) — pending commit
+- [x] 1.2 Lint passes (`npm run lint`) — pending commit
 
 #### Manual
 
@@ -132,8 +132,8 @@ Use server-side rendering and keep behavior read-only.
 
 #### Automated
 
-- [ ] 2.1 TypeScript compiles after UI pages
-- [ ] 2.2 Lint passes after UI pages
+- [x] 2.1 TypeScript compiles after UI pages — pending commit
+- [x] 2.2 Lint passes after UI pages — pending commit
 
 #### Manual
 

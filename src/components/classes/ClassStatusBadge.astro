@@ -1,0 +1,19 @@
+---
+interface Props {
+  availabilityStatus: "available" | "full";
+}
+
+const { availabilityStatus } = Astro.props;
+
+const label = availabilityStatus === "full" ? "Full" : "Available";
+const className =
+  availabilityStatus === "full"
+    ? "border-[#D7A441]/30 bg-[#D7A441]/15 text-[#7A5A1F]"
+    : "border-[#D9DEB8] bg-[#D9DEB8]/35 text-[#4F5A37]";
+---
+
+<span
+  class:list={["inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-wide", className]}
+>
+  {label}
+</span>
