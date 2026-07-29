@@ -312,15 +312,15 @@ The `create_reservation()` function is `SECURITY DEFINER` and bypasses RLS for i
 
 #### Automated
 
-- [x] 3.1 TypeScript compiles with updated App.Locals
-- [x] 3.2 Lint passes
+- [x] 3.1 TypeScript compiles with updated App.Locals — 7f34e94
+- [x] 3.2 Lint passes — 7f34e94
 
 #### Manual
 
-- [x] 3.3 /admin redirects client to /dashboard
-- [x] 3.4 /admin passes for admin or manager role
-- [x] 3.5 /admin redirects unauthenticated to /auth/signin
-- [x] 3.6 context.locals.role resolves for regular and promoted user
+- [x] 3.3 /admin redirects client to /dashboard — 7f34e94
+- [x] 3.4 /admin passes for admin or manager role — 7f34e94
+- [x] 3.5 /admin redirects unauthenticated to /auth/signin — 7f34e94
+- [x] 3.6 context.locals.role resolves for regular and promoted user — 7f34e94
 
 ### Phase 4: Verify and hand off
 
