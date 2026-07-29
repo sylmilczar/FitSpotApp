@@ -5,125 +5,97 @@ const signInHref = "/auth/signin?returnTo=%2F";
 const signUpHref = "/auth/signup?returnTo=%2F";
 ---
 
-<div class="bg-cosmic relative min-h-screen w-full overflow-hidden">
-  <!-- Cosmic orbs -->
-  <div
-    class="pointer-events-none absolute top-1/4 -left-24 h-[350px] w-[350px] rounded-full bg-purple-500/20 blur-[120px]"
-  >
-  </div>
-  <div
-    class="pointer-events-none absolute top-2/3 -right-16 h-[250px] w-[250px] rounded-full bg-blue-500/15 blur-[100px]"
-  >
-  </div>
-  <div
-    class="pointer-events-none absolute top-0 left-1/2 h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-indigo-400/10 blur-[140px]"
-  >
-  </div>
+<main class="bg-wellness min-h-screen px-4 py-6 sm:px-6 sm:py-8">
+  <section class="mx-auto max-w-5xl">
+    <Topbar variant="light" />
 
-  <!-- Star field -->
-  <div
-    class="pointer-events-none absolute inset-0"
-    style="background-image: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px), radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px), radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px); background-size: 200px 200px, 150px 150px, 100px 100px; background-position: 0 0, 40px 60px, 80px 30px;"
-  >
-  </div>
+    <div class="rounded-3xl border border-[#D9DEB8] bg-[#F8F8F5] p-8 sm:p-10">
+      <div class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+        <div>
+          <p
+            class="inline-flex rounded-full border border-[#C9D09A] bg-[#EEF1DB] px-3 py-1 text-xs font-semibold tracking-[0.18em] text-[#4F5A37] uppercase"
+          >
+            FitSpot Club
+          </p>
+          <h1 class="mt-5 max-w-xl text-4xl leading-tight font-bold text-[#1F1F1A] sm:text-5xl">
+            Train consistently without booking chaos.
+          </h1>
+          <p class="mt-4 max-w-xl text-base text-[#67675F] sm:text-lg">
+            FitSpot is a boutique fitness club where you can quickly check class schedules and reserve your spot.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-3 text-sm font-medium text-[#4F5A37]">
+            <span class="rounded-lg border border-[#D9DEB8] bg-white px-3 py-2">Small group coaching</span>
+            <span class="rounded-lg border border-[#D9DEB8] bg-white px-3 py-2">Fast online booking</span>
+            <span class="rounded-lg border border-[#D9DEB8] bg-white px-3 py-2">7 days schedule access</span>
+          </div>
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <a
+              href="/classes"
+              class="inline-flex items-center justify-center rounded-xl bg-[#4F5A37] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#3E472B]"
+            >
+              Browse classes
+            </a>
+            <a
+              href={signInHref}
+              class="inline-flex items-center justify-center rounded-xl border border-[#C9D09A] bg-white px-5 py-3 text-sm font-semibold text-[#4F5A37] transition-colors hover:bg-[#F2F4E8]"
+            >
+              Sign in
+            </a>
+            <a
+              href={signUpHref}
+              class="inline-flex items-center justify-center rounded-xl border border-transparent px-5 py-3 text-sm font-semibold text-[#4F5A37] transition-colors hover:bg-[#EEF1DB]"
+            >
+              Sign up
+            </a>
+          </div>
 
-  <div class="relative z-10 p-4 sm:p-8">
-    <Topbar />
+          <dl class="mt-8 grid max-w-xl grid-cols-3 gap-3">
+            <div class="rounded-xl border border-[#E0E5C0] bg-white p-3">
+              <dt class="text-xs font-medium text-[#67675F]">Slots</dt>
+              <dd class="mt-1 text-xl font-bold text-[#1F1F1A]">Live</dd>
+            </div>
+            <div class="rounded-xl border border-[#E0E5C0] bg-white p-3">
+              <dt class="text-xs font-medium text-[#67675F]">Booking</dt>
+              <dd class="mt-1 text-xl font-bold text-[#1F1F1A]">24/7</dd>
+            </div>
+            <div class="rounded-xl border border-[#E0E5C0] bg-white p-3">
+              <dt class="text-xs font-medium text-[#67675F]">Support</dt>
+              <dd class="mt-1 text-xl font-bold text-[#1F1F1A]">Direct</dd>
+            </div>
+          </dl>
+        </div>
 
-    <!-- Hero section -->
-    <div class="mx-auto flex max-w-4xl flex-col items-center justify-center px-4 py-24 text-center sm:py-32 lg:py-40">
-      <h1
-        class="mb-6 bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-5xl leading-tight font-bold text-transparent sm:text-6xl lg:text-7xl"
-      >
-        10x Astro Starter
-      </h1>
-      <p class="mb-10 max-w-2xl text-lg text-blue-100/70 sm:text-xl">
-        A production-ready starter with authentication, modern tooling, and a cosmic developer experience.
-      </p>
-      <div class="flex flex-col gap-4 sm:flex-row">
-        <a
-          href={signInHref}
-          class="inline-flex items-center justify-center rounded-lg bg-purple-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-purple-500"
-        >
-          Sign In
-        </a>
-        <a
-          href={signUpHref}
-          class="inline-flex items-center justify-center rounded-lg border border-white/20 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-white/10"
-        >
-          Sign Up
-        </a>
+        <div class="rounded-2xl border border-[#D9DEB8] bg-white p-6 shadow-[0_8px_20px_rgba(79,90,55,0.08)]">
+          <h2 class="text-sm font-semibold tracking-wide text-[#4F5A37] uppercase">Contact</h2>
+          <p class="mt-3 text-sm text-[#67675F]">Questions about class level or available spots?</p>
+          <ul class="mt-4 space-y-2 text-sm text-[#1F1F1A]">
+            <li>Phone: +48 600 123 456</li>
+            <li>Email: kontakt@fitspot.pl</li>
+            <li>Address: ul. Sportowa 12, Gdansk</li>
+          </ul>
+        </div>
       </div>
     </div>
 
-    <!-- Feature cards -->
-    <div class="mx-auto grid max-w-4xl grid-cols-1 gap-6 px-4 pb-24 sm:grid-cols-3">
-      <div class="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="mb-4 text-purple-300"
-        >
-          <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
-        <h3 class="mb-2 text-lg font-semibold text-white">Authentication Ready</h3>
-        <p class="text-sm leading-relaxed text-blue-100/60">
-          Built-in Supabase auth with sign in, sign up, and protected routes out of the box.
+    <div class="mt-8 grid gap-4 md:grid-cols-3">
+      <article class="rounded-2xl border border-[#E6E6DD] bg-white p-5">
+        <h3 class="text-base font-semibold text-[#1F1F1A]">Who we are</h3>
+        <p class="mt-2 text-sm text-[#67675F]">
+          FitSpot coaches lead small groups and adapt classes to participants' experience level.
         </p>
-      </div>
-
-      <div class="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="mb-4 text-purple-300"
-        >
-          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-          <polyline points="2 17 12 22 22 17"></polyline>
-          <polyline points="2 12 12 17 22 12"></polyline>
-        </svg>
-        <h3 class="mb-2 text-lg font-semibold text-white">Modern Stack</h3>
-        <p class="text-sm leading-relaxed text-blue-100/60">
-          Astro 5, React 19, Tailwind 4, and TypeScript — the latest tools, ready to go.
+      </article>
+      <article class="rounded-2xl border border-[#E6E6DD] bg-white p-5">
+        <h3 class="text-base font-semibold text-[#1F1F1A]">How it works</h3>
+        <p class="mt-2 text-sm text-[#67675F]">
+          Check availability, reserve online, and instantly see your booking confirmation.
         </p>
-      </div>
-
-      <div class="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="mb-4 text-purple-300"
-        >
-          <polyline points="16 18 22 12 16 6"></polyline>
-          <polyline points="8 6 2 12 8 18"></polyline>
-        </svg>
-        <h3 class="mb-2 text-lg font-semibold text-white">Developer Experience</h3>
-        <p class="text-sm leading-relaxed text-blue-100/60">
-          ESLint, Prettier, and pre-commit hooks keep your codebase clean from day one.
+      </article>
+      <article class="rounded-2xl border border-[#E6E6DD] bg-white p-5">
+        <h3 class="text-base font-semibold text-[#1F1F1A]">Who it is for</h3>
+        <p class="mt-2 text-sm text-[#67675F]">
+          For people who want to train regularly and keep quick, simple access to the class schedule.
         </p>
-      </div>
+      </article>
     </div>
-  </div>
-</div>
+  </section>
+</main>

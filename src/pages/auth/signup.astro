@@ -3,6 +3,8 @@ import Layout from "@/layouts/Layout.astro";
 import SignUpForm from "@/components/auth/SignUpForm";
 
 const error = Astro.url.searchParams.get("error");
+const returnTo = Astro.url.searchParams.get("returnTo");
+const signInHref = returnTo ? `/auth/signin?returnTo=${encodeURIComponent(returnTo)}` : "/auth/signin";
 ---
 
 <Layout title="Sign up">
@@ -13,9 +15,12 @@ const error = Astro.url.searchParams.get("error");
       <h1 class="mb-6 text-center text-2xl font-bold text-[#4F5A37]">Sign up</h1>
       <SignUpForm serverError={error} client:load />
       <p class="mt-4 text-center text-sm text-[#67675F]">
-        Already have an account? <a href="/auth/signin" class="text-[#4F5A37] hover:text-[#97A354] hover:underline"
+        Already have an account? <a href={signInHref} class="text-[#4F5A37] hover:text-[#97A354] hover:underline"
           >Sign in</a
         >
+      </p>
+      <p class="mt-2 text-center text-sm">
+        <a href="/" class="text-[#4F5A37] hover:text-[#97A354] hover:underline">Back to home</a>
       </p>
     </div>
   </div>

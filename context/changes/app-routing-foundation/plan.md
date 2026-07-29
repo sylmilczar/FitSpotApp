@@ -228,27 +228,27 @@ This is an application-routing migration. Remove stale references to `/dashboard
 
 #### Automated
 
-- [x] 1.1 TypeScript compiles (`npx tsc --noEmit`)
-- [x] 1.2 Lint passes (`npm run lint`)
+- [x] 1.1 TypeScript compiles (`npx tsc --noEmit`) — 2acf705
+- [x] 1.2 Lint passes (`npm run lint`) — 2acf705
 
 #### Manual
 
-- [x] 1.3 Auth-page returnTo `=/` redirects authenticated user to `/`
-- [x] 1.4 Auth-page returnTo `=/classes` redirects authenticated user to `/classes`
-- [x] 1.5 Invalid external returnTo falls back to `/classes`
+- [x] 1.3 Auth-page returnTo `=/` redirects authenticated user to `/` — 2acf705
+- [x] 1.4 Auth-page returnTo `=/classes` redirects authenticated user to `/classes` — 2acf705
+- [x] 1.5 Invalid external returnTo falls back to `/classes` — 2acf705
 
 ### Phase 2: Public Homepage and Navigation Contract
 
 #### Automated
 
-- [ ] 2.1 TypeScript compiles after homepage/nav/dashboard updates
-- [ ] 2.2 Lint passes after homepage/nav/dashboard updates
+- [x] 2.1 TypeScript compiles after homepage/nav/dashboard updates
+- [x] 2.2 Lint passes after homepage/nav/dashboard updates
 
 #### Manual
 
-- [ ] 2.3 Guest landing `/` shows public content and CTA paths
-- [ ] 2.4 Auth top navigation excludes dashboard and keeps classes + sign-out
-- [ ] 2.5 `/dashboard` is not part of the active app journey
+- [x] 2.3 Guest landing `/` shows public content and CTA paths
+- [x] 2.4 Auth top navigation excludes dashboard and keeps classes + sign-out
+- [x] 2.5 `/dashboard` is not part of the active app journey
 
 ### Phase 3: Auth Page Return-To Propagation
 

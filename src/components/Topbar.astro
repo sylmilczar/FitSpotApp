@@ -24,11 +24,11 @@ const signUpHref = `/auth/signup?returnTo=${encodedReturnTo}`;
       <>
         <span class:list={[mutedTextClass]}>{user.email}</span>
         <div class="flex items-center gap-3">
+          <a href="/" class:list={[linkClass]}>
+            Home
+          </a>
           <a href="/classes" class:list={[linkClass]}>
             Classes
-          </a>
-          <a href="/dashboard" class:list={[linkClass]}>
-            Dashboard
           </a>
           <form method="POST" action="/api/auth/signout">
             <button type="submit" class:list={[linkClass]}>
@@ -41,6 +41,9 @@ const signUpHref = `/auth/signup?returnTo=${encodedReturnTo}`;
       <>
         <span class:list={[mutedTextClass]}>Not signed in</span>
         <div class="flex gap-3">
+          <a href="/" class:list={[linkClass]}>
+            Home
+          </a>
           <a href="/classes" class:list={[linkClass]}>
             Classes
           </a>
