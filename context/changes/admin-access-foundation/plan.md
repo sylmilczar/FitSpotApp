@@ -326,7 +326,7 @@ The `create_reservation()` function is `SECURITY DEFINER` and bypasses RLS for i
 
 #### Automated
 
-- [ ] 4.1 supabase db reset succeeds end-to-end
+- [x] 4.1 supabase db reset succeeds end-to-end
 - [x] 4.2 npm run lint passes — 003b7ae
 - [x] 4.3 npx tsc --noEmit passes — 003b7ae
 
