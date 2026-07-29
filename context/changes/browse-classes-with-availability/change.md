@@ -1,7 +1,7 @@
 ---
 change_id: browse-classes-with-availability
 title: Browse classes with availability
-status: planning
+status: plan_reviewed
 created: 2026-07-29
 updated: 2026-07-29
 archived_at: null

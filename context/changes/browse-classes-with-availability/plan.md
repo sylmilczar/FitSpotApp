@@ -38,17 +38,22 @@ Use server-side rendering and keep behavior read-only.
 
 ### Changes Required
 
-1. `src/lib/` query module (new)
-- Add server-side read helpers for:
-  - upcoming classes list,
-  - class details by id,
-  - available spots calculation.
+1. `src/lib/classes.handler.ts` (new)
+- Add server-side read helpers:
+  - `listUpcomingClasses(): Promise<{ ok: true; data: ClassListItem[] } | { ok: false; message: string }>`
+    - Query contract: filter `starts_at > now()` and order `starts_at ASC`.
+  - `getClassDetailsById(id: string): Promise<{ ok: true; data: ClassDetailsView } | { ok: false; reason: "not_found" | "query_failed"; message: string }>`
+  - Pattern contract: keep the same discriminated-union style used in `src/lib/booking.handler.ts`.
 
-2. Shared typing
-- Add explicit TS types for class list item and class details view model.
+2. `src/types.ts`
+- Add explicit shared types:
+  - `ClassListItem`
+  - `ClassDetailsView`
 
-3. Error handling
-- Normalize empty/missing class behavior for details route (404 state).
+3. `src/pages/classes/[id].astro` contract dependency
+- Missing class must map to HTTP 404 and 404 page state based on `reason: "not_found"` from `getClassDetailsById`.
+- Implementation contract: set `Astro.response.status = 404` when `reason` is `"not_found"`.
+- Query failures must render a safe error state in the page (no runtime throw to client).
 
 ### Success Criteria
 
@@ -92,6 +97,7 @@ Use server-side rendering and keep behavior read-only.
 - Guest can open class list and detail pages.
 - List excludes past/started classes.
 - Detail view shows expected remaining spots.
+- Missing class id returns HTTP 404 with safe UI state.
 - UI follows `context/foundation/ui-design.md` palette and spacing constraints.
 
 ---
