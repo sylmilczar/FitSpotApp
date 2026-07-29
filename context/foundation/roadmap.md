@@ -31,7 +31,7 @@ W obecnym stanie rezerwacje zajec sa rozproszone miedzy telefon i komunikatory, 
 |---|---|---|---|---|---|
 | F-01 | booking-domain-foundation | (foundation) minimalny kontrakt domeny rezerwacji i dostepnosci jest gotowy pod flow klienta | — | FR-003, FR-004, FR-005, FR-007, Business Logic, Non-Functional Requirements | ready |
 | F-02 | admin-access-foundation | (foundation) minimalny kontrakt uprawnien dla roli client/manager/admin jest gotowy | — | Access Control, FR-008, FR-009, FR-010 | done |
-| S-01 | client-auth-journey | user can create an account and sign in to enter protected booking flow | — | FR-001, FR-002 | ready |
+| S-01 | client-auth-journey | user can create an account and sign in to enter protected booking flow | — | FR-001, FR-002 | done |
 | S-02 | reserve-class-with-guardrails | user can reserve an eligible class and see it in upcoming reservations with spot updates | S-01, S-03, F-01, F-02 | US-01, FR-005, FR-007, Non-Functional Requirements | proposed |
 | S-03 | browse-classes-with-availability | user can browse upcoming classes and view available spots in class details | F-01 | FR-003, FR-004 | proposed |
 | S-04 | manager-manage-classes-and-attendees | manager (and admin as superset) can manage classes and view class attendees | S-01, F-01, F-02 | FR-008, FR-009 | proposed |
@@ -99,7 +99,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Bez domknietego wejscia konta nie da sie wiarygodnie sprawdzic flow rezerwacji z ograniczeniami roli.
-- **Status:** ready
+- **Status:** done
 
 ### S-03: Przeglad zajec i dostepnych miejsc
 
@@ -180,5 +180,7 @@ This table is the clean handoff to Jira/Linear or any MCP-backed backlog. Includ
 (Empty on first generation. /10x-archive appends an entry here - and flips that item's Status to done - when a change whose Change ID matches the item is archived. Do NOT pre-populate. Format:)
 
 - **F-02: (foundation) reguly dostepu dla roli client/manager/admin sa gotowe dla operacji rezerwacji, zarzadzania grafikiem i zarzadzania uzytkownikami.** - Archived 2026-07-29 -> `context/archive/2026-06-30-admin-access-foundation/`. Lesson: —.
+
+- **S-01: user can create an account and sign in to enter protected booking flow.** - Archived 2026-07-29 -> `context/archive/2026-07-29-client-auth-journey/`. Lesson: —.
 
 - **<Slice ID>: <Outcome>** - Archived <YYYY-MM-DD> -> context/archive/<YYYY-MM-DD-change-id>/. Lesson: <pointer to lessons.md if any, or ->.
