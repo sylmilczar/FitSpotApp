@@ -2,7 +2,7 @@
 
 ## Overview
 
-We are building the minimal booking-domain foundation that future slices can consume without inventing their own data model or booking rules. The foundation will add the core booking schema, a status-based reservation model, atomic guardrails for capacity and duplicate prevention, a minimal seed fixture for local verification, and a narrow verification path. It will not add any booking UI or manager/admin workflows yet.
+We are building the minimal booking-domain foundation that future slices can consume without inventing their own data model or booking rules. The foundation will add the core booking schema, a status-based reservation model, atomic guardrails for capacity and duplicate prevention, a minimal seed fixture for local verification, and a narrow verification path. It will not add any booking UI or admin workflows yet.
 
 ## Current State Analysis
 
@@ -22,11 +22,11 @@ After this plan lands, the repository will have a versioned booking schema for c
 ## What We're NOT Doing
 
 - Booking UI, class browsing pages, or any client-facing reservation screens.
-- Manager/admin class management and attendee views.
+- Admin class management and attendee views.
 - Cancellation flow FR-006 beyond leaving the schema ready for it later.
 - Payments, memberships, or other non-goal scope.
 - Deploy, infra, or observability changes.
-- RLS policies for booking tables — explicitly deferred to a dedicated migration once F-02 (admin-access-foundation) lands, because role-based policies (client/manager/admin) depend on F-02's role column shape. A follow-up migration must add RLS before any booking tables are promoted to production.
+- RLS policies for booking tables — explicitly deferred to a dedicated migration once F-02 (admin-access-foundation) lands, because admin-role policies depend on F-02's role column shape. A follow-up migration must add RLS before any booking tables are promoted to production.
 
 ## Implementation Approach
 
@@ -35,10 +35,6 @@ Start with the booking schema and encode the domain in the database so later sli
 ## Critical Implementation Details
 
 The reservation write path must be atomic; UI-side checks are not enough because the PRD guardrails are correctness rules, not just UX rules. The schema should stay minimal but future-aware, so reservations keep history through status transitions rather than disappearing on cancellation. Seed data is only for repeatable local verification, and it should stay small enough that it does not become a second feature.
-
-## UI Design Handoff Constraint
-
-Although this change does not implement UI, it must prepare a clean handoff for user-facing slices. S-02 and S-03 must implement screens using the visual system in `context/foundation/ui-design.md` (calm premium tone, olive accent hierarchy, accessibility states, and spacing rules). This foundation change therefore includes documenting how domain outcomes map to UI states without introducing UI code in this change.
 
 ## Decisions
 
@@ -129,7 +125,6 @@ Prove that the migration, seed, and contract work together and leave the foundat
 - Run a local database reset against the new schema and seed.
 - Add a targeted contract check: a SQL script (or Vitest test calling Supabase RPC via the local instance) that calls `create_reservation` and asserts all four cases: success, `CLASS_FULL`, `ALREADY_RESERVED`, and `CLASS_STARTED`.
 - Confirm that the resulting foundation is sufficient for S-02 and S-03 without additional schema work.
-- Add a handoff note for S-02/S-03 that maps booking outcomes (`ok`, `CLASS_FULL`, `ALREADY_RESERVED`, `CLASS_STARTED`) to UI states and requires visual implementation to follow `context/foundation/ui-design.md`.
 - Update the change metadata so the work is tracked as planned.
 
 ### Exit Criteria
@@ -137,7 +132,6 @@ Prove that the migration, seed, and contract work together and leave the foundat
 - Local reset succeeds with the new booking schema.
 - The booking contract passes its targeted check.
 - The foundation is ready for downstream planning and implementation.
-- The downstream handoff explicitly references `context/foundation/ui-design.md` and defines UI-state mappings for booking outcomes.
 
 ### Risks
 
@@ -152,32 +146,31 @@ Prove that the migration, seed, and contract work together and leave the foundat
 
 #### Automated
 
-- [x] 1.1 Migration file created in supabase/migrations/ — 4d334aa
-- [x] 1.2 supabase db reset succeeds with booking schema — 4d334aa
+- [ ] 1.1 Migration file created in supabase/migrations/
+- [ ] 1.2 supabase db reset succeeds with booking schema
 
 #### Manual
 
-- [x] 1.3 Seed fixture loads during local reset — 4d334aa
+- [ ] 1.3 Seed fixture loads during local reset
 
 ### Phase 2: Implement the booking contract
 
 #### Automated
 
-- [x] 2.1 Single booking contract enforces all three guardrails — 5997027
-- [x] 2.2 Contract returns typed success/failure outcomes for each guardrail — 5997027
+- [ ] 2.1 Single booking contract enforces all three guardrails
+- [ ] 2.2 Contract returns typed success/failure outcomes for each guardrail
 
 #### Manual
 
-- [x] 2.3 No booking logic duplicated — S-02/S-03 can import the contract directly — 5997027
+- [ ] 2.3 No booking logic duplicated — S-02/S-03 can import the contract directly
 
 ### Phase 3: Verify and hand off
 
 #### Automated
 
-- [x] 3.1 Local db reset succeeds with new booking schema — efaea26
-- [x] 3.2 Targeted contract check passes — efaea26
+- [ ] 3.1 Local db reset succeeds with new booking schema
+- [ ] 3.2 Targeted contract check passes
 
 #### Manual
 
-- [x] 3.3 Foundation confirmed sufficient for S-02 and S-03 without additional schema work — efaea26
-- [x] 3.4 Handoff note for S-02/S-03 includes UI-state mapping and `context/foundation/ui-design.md` reference — efaea26
+- [ ] 3.3 Foundation confirmed sufficient for S-02 and S-03 without additional schema work
