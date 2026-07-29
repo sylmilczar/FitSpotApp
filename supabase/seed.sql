@@ -1,4 +1,5 @@
--- Minimal booking-domain seed fixture for local verification
+-- Stable booking-domain fixtures for local manual verification.
+-- Uses upsert so repeated runs keep classes fresh relative to now().
 
 insert into public.classes (id, name, description, capacity, starts_at)
 values
@@ -21,9 +22,29 @@ values
     'Sunset Stretch',
     'Recovery-focused evening stretching class.',
     10,
-    now() - interval '1 hour'
+    date_trunc('day', now())
+      + make_interval(hours => greatest(8, least(21, extract(hour from now())::int - 1)))
+  ),
+  (
+    '44444444-4444-4444-4444-444444444444',
+    'Pilates Core Flow',
+    'Core stability and posture-focused pilates session.',
+    14,
+    now() + interval '3 days'
+  ),
+  (
+    '55555555-5555-5555-5555-555555555555',
+    'Power Circuit',
+    'High-energy interval circuit with bodyweight stations.',
+    16,
+    now() + interval '5 days'
   )
-on conflict (id) do nothing;
+on conflict (id) do update
+set
+  name = excluded.name,
+  description = excluded.description,
+  capacity = excluded.capacity,
+  starts_at = excluded.starts_at;
 
 -- ---------------------------------------------------------------------------
 -- Local admin/manager promotion template

@@ -1,12 +1,13 @@
 ---
 import ClassStatusBadge from "@/components/classes/ClassStatusBadge.astro";
+import Topbar from "@/components/Topbar.astro";
 import { getClassDetailsById } from "@/lib/classes.handler";
 import Layout from "@/layouts/Layout.astro";
 
 const classId = Astro.params.id ?? "";
-const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(classId);
+const isUuidLike = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(classId);
 
-const result = isUuid
+const result = isUuidLike
   ? await getClassDetailsById(classId)
   : { ok: false as const, reason: "not_found" as const, message: "Class not found" };
 
@@ -32,6 +33,8 @@ const dateLabel = startsAt
 <Layout title={classItem ? classItem.name : "Class details"}>
   <main class="bg-wellness min-h-screen px-4 py-10 sm:px-6">
     <section class="mx-auto max-w-3xl">
+      <Topbar variant="light" />
+
       <a
         href="/classes"
         class="mb-6 inline-flex text-sm font-medium text-[#4F5A37] hover:text-[#97A354] hover:underline"

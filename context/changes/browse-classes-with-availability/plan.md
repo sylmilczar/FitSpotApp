@@ -13,10 +13,12 @@ This change prepares and then implements roadmap slice S-03: clients can browse 
 
 ## Desired End State
 
-- Public route with upcoming classes list is available.
+- Public route with 7-day classes timetable (today + next 6 days) is available.
 - Public route with class details (including available spots) is available.
 - Availability is computed from `capacity - confirmed_reservations_count`.
-- Started classes are excluded from list.
+- Started classes remain visible in timetable and are marked unavailable.
+- Timetable rows cover hours from 08:00 to 21:00 (hourly slots).
+- Timetable bucketing uses UTC consistently in query windowing and UI rendering.
 - UI follows `context/foundation/ui-design.md` and booking handoff constraints.
 
 ## What We're NOT Doing
@@ -41,7 +43,9 @@ Use server-side rendering and keep behavior read-only.
 1. `src/lib/classes.handler.ts` (new)
 - Add server-side read helpers:
   - `listUpcomingClasses(): Promise<{ ok: true; data: ClassListItem[] } | { ok: false; message: string }>`
-    - Query contract: filter `starts_at > now()` and order `starts_at ASC`.
+    - Query contract: include classes from current day in a 7-day window, constrained to 08:00-21:00 slots and ordered by `starts_at ASC`.
+    - Derive `isStarted` marker from `startsAt <= now` in application layer to drive unavailable state in the schedule grid.
+    - Timezone contract: enforce UTC for schedule windowing and hour filtering.
   - `getClassDetailsById(id: string): Promise<{ ok: true; data: ClassDetailsView } | { ok: false; reason: "not_found" | "query_failed"; message: string }>`
   - Pattern contract: keep the same discriminated-union style used in `src/lib/booking.handler.ts`.
 
@@ -64,7 +68,7 @@ Use server-side rendering and keep behavior read-only.
 
 #### Manual
 
-- Query helpers return only classes with `starts_at > now()`.
+- Query helpers return classes in 7-day schedule window (UTC day boundary, 08:00-21:00 UTC slots), including started classes.
 - Available spots are never negative and match DB state.
 
 ---
@@ -74,7 +78,8 @@ Use server-side rendering and keep behavior read-only.
 ### Changes Required
 
 1. `src/pages/classes/index.astro` (new)
-- Render upcoming classes list with key metadata and availability badge.
+- Render timetable grid: first column hours 08:00-21:00, first row next 7 days from today.
+- Render class entries inside matching day/hour cells with unavailable state when started/full.
 
 2. `src/pages/classes/[id].astro` (new)
 - Render class details with available spots and started/full states.
@@ -95,7 +100,8 @@ Use server-side rendering and keep behavior read-only.
 #### Manual
 
 - Guest can open class list and detail pages.
-- List excludes past/started classes.
+- Timetable shows 7 day columns from today and hourly rows 08:00-21:00.
+- Started classes remain visible and are marked unavailable.
 - Detail view shows expected remaining spots.
 - Missing class id returns HTTP 404 with safe UI state.
 - UI follows `context/foundation/ui-design.md` palette and spacing constraints.
@@ -125,8 +131,8 @@ Use server-side rendering and keep behavior read-only.
 
 #### Manual
 
-- [ ] 1.3 Upcoming classes query excludes started classes
-- [ ] 1.4 Available spots formula matches DB values
+- [x] 1.3 Upcoming classes query makes started classes unavailable
+- [x] 1.4 Available spots formula matches DB values
 
 ### Phase 2: Browse pages and UI
 
@@ -137,6 +143,6 @@ Use server-side rendering and keep behavior read-only.
 
 #### Manual
 
-- [ ] 2.3 Guest can browse classes list
-- [ ] 2.4 Guest can open class details
-- [ ] 2.5 UI conforms to ui-design palette and spacing
+- [x] 2.3 Guest can browse classes list
+- [x] 2.4 Guest can open class details
+- [x] 2.5 UI conforms to ui-design palette and spacing

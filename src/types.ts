@@ -23,6 +23,7 @@ export interface ClassListItem {
   confirmedReservationsCount: number;
   availableSpots: number;
   isFull: boolean;
+  isStarted: boolean;
 }
 
 export type ClassDetailsView = ClassListItem;

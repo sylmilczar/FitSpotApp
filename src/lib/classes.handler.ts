@@ -58,6 +58,7 @@ function mapClassRow(row: ClassAvailabilityRow): ClassListItem {
     confirmedReservationsCount: row.confirmed_reservations_count,
     availableSpots: Math.max(row.available_spots, 0),
     isFull: row.is_full,
+    isStarted: new Date(row.starts_at).getTime() <= Date.now(),
   };
 }
 

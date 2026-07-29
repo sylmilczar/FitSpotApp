@@ -1,14 +1,61 @@
 ---
-import ClassCard from "@/components/classes/ClassCard.astro";
+import Topbar from "@/components/Topbar.astro";
+import type { ClassListItem } from "@/types";
 import { listUpcomingClasses } from "@/lib/classes.handler";
 import Layout from "@/layouts/Layout.astro";
 
 const result = await listUpcomingClasses();
+
+const hours = Array.from({ length: 14 }, (_, idx) => idx + 8);
+const dayStart = new Date();
+dayStart.setUTCHours(0, 0, 0, 0);
+
+const days = Array.from({ length: 7 }, (_, idx) => {
+  const date = new Date(dayStart);
+  date.setUTCDate(dayStart.getUTCDate() + idx);
+  return {
+    date,
+    key: `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`,
+    label: new Intl.DateTimeFormat("en-US", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    }).format(date),
+  };
+});
+
+function getClassCellItems(classes: ClassListItem[], day: Date, hour: number) {
+  return classes.filter((classItem) => {
+    const startsAt = new Date(classItem.startsAt);
+
+    return (
+      startsAt.getUTCFullYear() === day.getUTCFullYear() &&
+      startsAt.getUTCMonth() === day.getUTCMonth() &&
+      startsAt.getUTCDate() === day.getUTCDate() &&
+      startsAt.getUTCHours() === hour
+    );
+  });
+}
+
+function formatHour(hour: number) {
+  return `${hour.toString().padStart(2, "0")}:00`;
+}
+
+function formatClassTime(startsAtIso: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  }).format(new Date(startsAtIso));
+}
 ---
 
 <Layout title="Upcoming classes">
   <main class="bg-wellness min-h-screen px-4 py-10 sm:px-6">
     <section class="mx-auto max-w-5xl">
+      <Topbar variant="light" />
+
       <header class="mb-8">
         <p class="text-sm font-medium tracking-wide text-[#4F5A37] uppercase">FitSpot schedule</p>
         <h1 class="mt-2 text-3xl font-bold text-[#1F1F1A] sm:text-4xl">Upcoming classes</h1>
@@ -19,18 +66,75 @@ const result = await listUpcomingClasses();
 
       {
         result.ok ? (
-          result.data.length > 0 ? (
-            <div class="grid gap-6 md:grid-cols-2">
-              {result.data.map((classItem) => (
-                <ClassCard classItem={classItem} />
-              ))}
+          <>
+            <div class="overflow-x-auto rounded-2xl border border-[#E6E6DD] bg-[#FFFFFF] shadow-[0_10px_24px_rgba(79,90,55,0.08)]">
+              <table class="min-w-[900px] border-collapse text-sm">
+                <thead>
+                  <tr class="border-b border-[#E6E6DD] bg-[#F8F8F5]">
+                    <th class="w-28 px-4 py-4 text-left font-semibold text-[#4F5A37]">Hour</th>
+                    {days.map((day) => (
+                      <th class="min-w-[120px] px-4 py-4 text-left font-semibold text-[#4F5A37]">{day.label}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {hours.map((hour) => (
+                    <tr class="border-b border-[#E6E6DD] align-top">
+                      <th class="px-4 py-4 text-left font-semibold text-[#67675F]">{formatHour(hour)}</th>
+                      {days.map((day) => {
+                        const classesInCell = getClassCellItems(result.data, day.date, hour);
+
+                        return (
+                          <td class="px-3 py-3">
+                            {classesInCell.length > 0 ? (
+                              <div class="space-y-2">
+                                {classesInCell.map((classItem) => {
+                                  const isUnavailable = classItem.isStarted || classItem.isFull;
+
+                                  return (
+                                    <a
+                                      href={`/classes/${classItem.id}`}
+                                      class:list={[
+                                        "block rounded-xl border px-3 py-2 transition-colors",
+                                        isUnavailable
+                                          ? "border-[#D7A441]/40 bg-[#D7A441]/10 text-[#7A5A1F]"
+                                          : "border-[#D9DEB8] bg-[#D9DEB8]/35 text-[#4F5A37] hover:bg-[#D9DEB8]/55",
+                                      ]}
+                                    >
+                                      <p class="text-xs font-semibold tracking-wide uppercase">
+                                        {formatClassTime(classItem.startsAt)}
+                                      </p>
+                                      <p class="mt-1 text-sm font-semibold">{classItem.name}</p>
+                                      <p class="mt-1 text-xs">
+                                        {isUnavailable
+                                          ? "Unavailable"
+                                          : `${classItem.availableSpots}/${classItem.capacity} available`}
+                                      </p>
+                                    </a>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <div class="rounded-xl border border-transparent px-3 py-6 text-center text-xs text-[#9A9A92]">
+                                -
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ) : (
-            <div class="rounded-2xl border border-[#E6E6DD] bg-[#FFFFFF] p-8 text-center text-[#67675F]">
-              <p class="font-medium text-[#1F1F1A]">No upcoming classes yet</p>
-              <p class="mt-2 text-sm">Please check back soon for new sessions.</p>
-            </div>
-          )
+
+            {result.data.length === 0 ? (
+              <div class="mt-6 rounded-2xl border border-[#E6E6DD] bg-[#FFFFFF] p-8 text-center text-[#67675F]">
+                <p class="font-medium text-[#1F1F1A]">No classes in the next 7 days</p>
+                <p class="mt-2 text-sm">Try checking back later for new sessions.</p>
+              </div>
+            ) : null}
+          </>
         ) : (
           <div
             class="rounded-2xl border border-[#C95B5B]/30 bg-[#FFFFFF] p-8 text-[#C95B5B]"

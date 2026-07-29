@@ -1,23 +1,33 @@
 ---
+const variant = Astro.props.variant === "light" ? "light" : "dark";
 const { user } = Astro.locals;
+
+const containerClass =
+  variant === "light"
+    ? "mb-6 flex items-center justify-between rounded-2xl border border-[#E6E6DD] bg-[#FFFFFF] px-4 py-3 text-sm text-[#1F1F1A]"
+    : "mb-4 flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80";
+
+const mutedTextClass = variant === "light" ? "text-[#67675F]" : "text-blue-100/70";
+const linkClass =
+  variant === "light"
+    ? "text-[#4F5A37] transition-colors hover:text-[#97A354] hover:underline"
+    : "text-purple-300 transition-colors hover:text-purple-100 hover:underline";
 ---
 
-<div
-  class="mb-4 flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80"
->
+<div class:list={[containerClass]}>
   {
     user ? (
       <>
-        <span class="text-blue-100/70">{user.email}</span>
+        <span class:list={[mutedTextClass]}>{user.email}</span>
         <div class="flex items-center gap-3">
-          <a href="/classes" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">
+          <a href="/classes" class:list={[linkClass]}>
             Classes
           </a>
-          <a href="/dashboard" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">
+          <a href="/dashboard" class:list={[linkClass]}>
             Dashboard
           </a>
           <form method="POST" action="/api/auth/signout">
-            <button type="submit" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">
+            <button type="submit" class:list={[linkClass]}>
               Sign out
             </button>
           </form>
@@ -25,15 +35,15 @@ const { user } = Astro.locals;
       </>
     ) : (
       <>
-        <span class="text-blue-100/70">Not signed in</span>
+        <span class:list={[mutedTextClass]}>Not signed in</span>
         <div class="flex gap-3">
-          <a href="/classes" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">
+          <a href="/classes" class:list={[linkClass]}>
             Classes
           </a>
-          <a href="/auth/signin" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">
+          <a href="/auth/signin" class:list={[linkClass]}>
             Sign in
           </a>
-          <a href="/auth/signup" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">
+          <a href="/auth/signup" class:list={[linkClass]}>
             Sign up
           </a>
         </div>
