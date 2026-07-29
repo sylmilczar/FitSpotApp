@@ -15,12 +15,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.user = user ?? null;
 
     if (user) {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("role")
         .eq("user_id", user.id)
         .single();
-      context.locals.role = (profile?.role as AppRole) ?? null;
+      context.locals.role = profileError ? null : (profile.role as AppRole);
     } else {
       context.locals.role = null;
     }
@@ -46,4 +46,3 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   return next();
 });
-
