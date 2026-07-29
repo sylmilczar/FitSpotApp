@@ -1,5 +1,8 @@
 ---
 import Topbar from "@/components/Topbar.astro";
+
+const signInHref = "/auth/signin?returnTo=%2F";
+const signUpHref = "/auth/signup?returnTo=%2F";
 ---
 
 <div class="bg-cosmic relative min-h-screen w-full overflow-hidden">
@@ -39,13 +42,13 @@ import Topbar from "@/components/Topbar.astro";
       </p>
       <div class="flex flex-col gap-4 sm:flex-row">
         <a
-          href="/auth/signin"
+          href={signInHref}
           class="inline-flex items-center justify-center rounded-lg bg-purple-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-purple-500"
         >
           Sign In
         </a>
         <a
-          href="/auth/signup"
+          href={signUpHref}
           class="inline-flex items-center justify-center rounded-lg border border-white/20 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-white/10"
         >
           Sign Up

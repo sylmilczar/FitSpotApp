@@ -1,10 +1,10 @@
 import { defineMiddleware } from "astro:middleware";
 import { createClient } from "@/lib/supabase";
+import { AUTH_SIGNIN_ROUTE, AUTH_SIGNUP_ROUTE, CLASSES_ROUTE, getPostLoginDestination } from "@/lib/routing";
 import type { AppRole } from "@/types";
 
-const PROTECTED_ROUTES = ["/dashboard"];
 const ADMIN_ROUTES = ["/admin"];
-const AUTH_PAGES = ["/auth/signin", "/auth/signup"];
+const AUTH_PAGES = [AUTH_SIGNIN_ROUTE, AUTH_SIGNUP_ROUTE];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const supabase = createClient(context.request.headers, context.cookies);
@@ -30,24 +30,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.role = null;
   }
 
-  if (PROTECTED_ROUTES.some((route) => context.url.pathname.startsWith(route))) {
-    if (!context.locals.user) {
-      return context.redirect("/auth/signin");
-    }
-  }
-
   if (AUTH_PAGES.some((route) => context.url.pathname.startsWith(route))) {
     if (context.locals.user) {
-      return context.redirect("/dashboard");
+      const returnTo = context.url.searchParams.get("returnTo");
+      return context.redirect(getPostLoginDestination(returnTo));
     }
   }
 
   if (ADMIN_ROUTES.some((route) => context.url.pathname.startsWith(route))) {
     if (!context.locals.user) {
-      return context.redirect("/auth/signin");
+      return context.redirect(AUTH_SIGNIN_ROUTE);
     }
     if (context.locals.role !== "admin" && context.locals.role !== "manager") {
-      return context.redirect("/dashboard");
+      return context.redirect(CLASSES_ROUTE);
     }
   }
 

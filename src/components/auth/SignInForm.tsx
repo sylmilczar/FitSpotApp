@@ -7,9 +7,10 @@ import { ServerError } from "@/components/auth/ServerError";
 
 interface Props {
   serverError?: string | null;
+  returnTo?: string | null;
 }
 
-export default function SignInForm({ serverError }: Props) {
+export default function SignInForm({ serverError, returnTo }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -41,6 +42,8 @@ export default function SignInForm({ serverError }: Props) {
 
   return (
     <form method="POST" action="/api/auth/signin" className="space-y-4" onSubmit={handleSubmit} noValidate>
+      {returnTo ? <input type="hidden" name="returnTo" value={returnTo} /> : null}
+
       <FormField
         id="email"
         type="email"

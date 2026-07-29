@@ -12,6 +12,10 @@ const linkClass =
   variant === "light"
     ? "text-[#4F5A37] transition-colors hover:text-[#97A354] hover:underline"
     : "text-purple-300 transition-colors hover:text-purple-100 hover:underline";
+const returnTo = `${Astro.url.pathname}${Astro.url.search}`;
+const encodedReturnTo = encodeURIComponent(returnTo);
+const signInHref = `/auth/signin?returnTo=${encodedReturnTo}`;
+const signUpHref = `/auth/signup?returnTo=${encodedReturnTo}`;
 ---
 
 <div class:list={[containerClass]}>
@@ -40,10 +44,10 @@ const linkClass =
           <a href="/classes" class:list={[linkClass]}>
             Classes
           </a>
-          <a href="/auth/signin" class:list={[linkClass]}>
+          <a href={signInHref} class:list={[linkClass]}>
             Sign in
           </a>
-          <a href="/auth/signup" class:list={[linkClass]}>
+          <a href={signUpHref} class:list={[linkClass]}>
             Sign up
           </a>
         </div>

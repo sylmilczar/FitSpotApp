@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { getPostLoginDestination } from "@/lib/routing";
 import { createClient } from "@/lib/supabase";
 import { z } from "zod";
 
@@ -23,6 +24,7 @@ function getSignInValidationMessage(error: z.ZodError): string {
 
 export const POST: APIRoute = async (context) => {
   const form = await context.request.formData();
+  const returnTo = form.get("returnTo");
   const parsed = signInSchema.safeParse({
     email: form.get("email"),
     password: form.get("password"),
@@ -45,5 +47,5 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(`/auth/signin?error=${encodeURIComponent(error.message)}`);
   }
 
-  return context.redirect("/dashboard");
+  return context.redirect(getPostLoginDestination(typeof returnTo === "string" ? returnTo : null));
 };
