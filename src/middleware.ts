@@ -4,6 +4,7 @@ import type { AppRole } from "@/types";
 
 const PROTECTED_ROUTES = ["/dashboard"];
 const ADMIN_ROUTES = ["/admin"];
+const AUTH_PAGES = ["/auth/signin", "/auth/signup"];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const supabase = createClient(context.request.headers, context.cookies);
@@ -32,6 +33,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (PROTECTED_ROUTES.some((route) => context.url.pathname.startsWith(route))) {
     if (!context.locals.user) {
       return context.redirect("/auth/signin");
+    }
+  }
+
+  if (AUTH_PAGES.some((route) => context.url.pathname.startsWith(route))) {
+    if (context.locals.user) {
+      return context.redirect("/dashboard");
     }
   }
 
