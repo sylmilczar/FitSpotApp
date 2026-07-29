@@ -1,7 +1,7 @@
 ---
 change_id: app-routing-foundation
 title: App routing foundation
-status: implementing
+status: implemented
 created: 2026-07-29
 updated: 2026-07-29
 archived_at: null

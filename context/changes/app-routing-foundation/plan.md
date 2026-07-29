@@ -254,11 +254,11 @@ This is an application-routing migration. Remove stale references to `/dashboard
 
 #### Automated
 
-- [x] 3.1 TypeScript compiles after auth form propagation changes
-- [x] 3.2 Lint passes after auth form propagation changes
+- [x] 3.1 TypeScript compiles after auth form propagation changes — 60659a6
+- [x] 3.2 Lint passes after auth form propagation changes — 60659a6
 
 #### Manual
 
-- [x] 3.3 Sign-in with returnTo `/` returns user to `/`
-- [x] 3.4 Sign-in with returnTo `/classes` returns user to `/classes`
-- [x] 3.5 Switching auth pages preserves returnTo context
+- [x] 3.3 Sign-in with returnTo `/` returns user to `/` — 60659a6
+- [x] 3.4 Sign-in with returnTo `/classes` returns user to `/classes` — 60659a6
+- [x] 3.5 Switching auth pages preserves returnTo context — 60659a6
