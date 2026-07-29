@@ -94,8 +94,8 @@ Apply minimal high-confidence changes in auth pages and auth API handlers. Keep 
 
 #### Manual
 
-- [ ] 1.3 Signup valid flow reaches confirm-email
-- [ ] 1.4 Signup mismatch passwords rejected server-side
-- [ ] 1.5 Signin success redirects to /dashboard
-- [ ] 1.6 Authenticated user is redirected away from /auth/signin and /auth/signup
-- [ ] 1.7 Unauthenticated user is redirected from /dashboard to /auth/signin
+- [x] 1.3 Signup valid flow reaches confirm-email — d9d8b8c
+- [x] 1.4 Signup mismatch passwords rejected server-side — d9d8b8c
+- [x] 1.5 Signin success redirects to /dashboard — d9d8b8c
+- [x] 1.6 Authenticated user is redirected away from /auth/signin and /auth/signup — d9d8b8c
+- [x] 1.7 Unauthenticated user is redirected from /dashboard to /auth/signin — d9d8b8c
