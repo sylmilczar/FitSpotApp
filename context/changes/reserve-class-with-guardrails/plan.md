@@ -270,17 +270,17 @@ Phase gates for this change are TypeScript, lint, and manual verification listed
 
 #### Automated
 
-- [x] 2.1 TypeScript compiles after class-details reservation integration
-- [x] 2.2 Lint passes after class-details reservation integration
+- [x] 2.1 TypeScript compiles after class-details reservation integration — 43179d7
+- [x] 2.2 Lint passes after class-details reservation integration — 43179d7
 
 #### Manual
 
-- [x] 2.3 Guest reserve redirects to signin and returns to same class
-- [x] 2.4 Success reserve shows dedicated modal message
-- [x] 2.5 Guardrail codes show correct modal messages
-- [x] 2.6 Double-submit does not create duplicate reservations
-- [x] 2.7 Closing modal clears reserve result query params
-- [x] 2.8 Reservation API auth context and signin redirect path are preserved
+- [x] 2.3 Guest reserve redirects to signin and returns to same class — 43179d7
+- [x] 2.4 Success reserve shows dedicated modal message — 43179d7
+- [x] 2.5 Guardrail codes show correct modal messages — 43179d7
+- [x] 2.6 Double-submit does not create duplicate reservations — 43179d7
+- [x] 2.7 Closing modal clears reserve result query params — 43179d7
+- [x] 2.8 Reservation API auth context and signin redirect path are preserved — 43179d7
 
 ### Phase 3: "My Upcoming" Section on Classes Page
 
