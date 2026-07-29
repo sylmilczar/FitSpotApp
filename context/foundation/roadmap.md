@@ -3,7 +3,7 @@ project: FitSpotApp for a Small Fitness Club
 version: 1
 status: draft
 created: 2026-06-29
-updated: 2026-06-30
+updated: 2026-07-29
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -30,7 +30,7 @@ W obecnym stanie rezerwacje zajec sa rozproszone miedzy telefon i komunikatory, 
 | ID | Change ID | Outcome (user can ...) | Prerequisites | PRD refs | Status |
 |---|---|---|---|---|---|
 | F-01 | booking-domain-foundation | (foundation) minimalny kontrakt domeny rezerwacji i dostepnosci jest gotowy pod flow klienta | — | FR-003, FR-004, FR-005, FR-007, Business Logic, Non-Functional Requirements | ready |
-| F-02 | admin-access-foundation | (foundation) minimalny kontrakt uprawnien dla roli client/manager/admin jest gotowy | — | Access Control, FR-008, FR-009, FR-010 | ready |
+| F-02 | admin-access-foundation | (foundation) minimalny kontrakt uprawnien dla roli client/manager/admin jest gotowy | — | Access Control, FR-008, FR-009, FR-010 | done |
 | S-01 | client-auth-journey | user can create an account and sign in to enter protected booking flow | — | FR-001, FR-002 | ready |
 | S-02 | reserve-class-with-guardrails | user can reserve an eligible class and see it in upcoming reservations with spot updates | S-01, S-03, F-01, F-02 | US-01, FR-005, FR-007, Non-Functional Requirements | proposed |
 | S-03 | browse-classes-with-availability | user can browse upcoming classes and view available spots in class details | F-01 | FR-003, FR-004 | proposed |
@@ -85,7 +85,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Bez jasnych granic rol latwo o regresje bezpieczenstwa przy pracy pod presja czasu.
-- **Status:** ready
+- **Status:** done
 
 ## Slices
 
@@ -178,5 +178,7 @@ This table is the clean handoff to Jira/Linear or any MCP-backed backlog. Includ
 ## Done
 
 (Empty on first generation. /10x-archive appends an entry here - and flips that item's Status to done - when a change whose Change ID matches the item is archived. Do NOT pre-populate. Format:)
+
+- **F-02: (foundation) reguly dostepu dla roli client/manager/admin sa gotowe dla operacji rezerwacji, zarzadzania grafikiem i zarzadzania uzytkownikami.** - Archived 2026-07-29 -> `context/archive/2026-06-30-admin-access-foundation/`. Lesson: —.
 
 - **<Slice ID>: <Outcome>** - Archived <YYYY-MM-DD> -> context/archive/<YYYY-MM-DD-change-id>/. Lesson: <pointer to lessons.md if any, or ->.
