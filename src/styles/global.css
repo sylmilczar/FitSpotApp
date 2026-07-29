@@ -115,7 +115,7 @@
 }
 
 @utility bg-wellness {
-  background-color: #f8f8f5;
+  background-color: rgba(248, 248, 245, 0.78);
 }
 
 @layer base {
@@ -125,4 +125,38 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.app-photo-bg {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+}
+
+.app-photo-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("../assets/uptownfitness-fitness-1948813.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: blur(8px);
+  transform: scale(1.06);
+  z-index: -2;
+  pointer-events: none;
+}
+
+.app-photo-bg::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(248, 248, 245, 0.5);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.app-photo-bg > * {
+  position: relative;
+  z-index: 1;
 }

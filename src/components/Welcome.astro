@@ -1,8 +1,5 @@
 ---
 import Topbar from "@/components/Topbar.astro";
-
-const signInHref = "/auth/signin?returnTo=%2F";
-const signUpHref = "/auth/signup?returnTo=%2F";
 ---
 
 <main class="bg-wellness min-h-screen px-4 py-6 sm:px-6 sm:py-8">
@@ -31,21 +28,9 @@ const signUpHref = "/auth/signup?returnTo=%2F";
           <div class="mt-8 flex flex-wrap items-center gap-3">
             <a
               href="/classes"
-              class="inline-flex items-center justify-center rounded-xl bg-[#4F5A37] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#3E472B]"
+              class="inline-flex w-full items-center justify-center rounded-xl bg-[#4F5A37] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#3E472B]"
             >
               Browse classes
-            </a>
-            <a
-              href={signInHref}
-              class="inline-flex items-center justify-center rounded-xl border border-[#C9D09A] bg-white px-5 py-3 text-sm font-semibold text-[#4F5A37] transition-colors hover:bg-[#F2F4E8]"
-            >
-              Sign in
-            </a>
-            <a
-              href={signUpHref}
-              class="inline-flex items-center justify-center rounded-xl border border-transparent px-5 py-3 text-sm font-semibold text-[#4F5A37] transition-colors hover:bg-[#EEF1DB]"
-            >
-              Sign up
             </a>
           </div>
 

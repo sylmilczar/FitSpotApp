@@ -241,24 +241,24 @@ This is an application-routing migration. Remove stale references to `/dashboard
 
 #### Automated
 
-- [x] 2.1 TypeScript compiles after homepage/nav/dashboard updates
-- [x] 2.2 Lint passes after homepage/nav/dashboard updates
+- [x] 2.1 TypeScript compiles after homepage/nav/dashboard updates — a86fe5e
+- [x] 2.2 Lint passes after homepage/nav/dashboard updates — a86fe5e
 
 #### Manual
 
-- [x] 2.3 Guest landing `/` shows public content and CTA paths
-- [x] 2.4 Auth top navigation excludes dashboard and keeps classes + sign-out
-- [x] 2.5 `/dashboard` is not part of the active app journey
+- [x] 2.3 Guest landing `/` shows public content and CTA paths — a86fe5e
+- [x] 2.4 Auth top navigation excludes dashboard and keeps classes + sign-out — a86fe5e
+- [x] 2.5 `/dashboard` is not part of the active app journey — a86fe5e
 
 ### Phase 3: Auth Page Return-To Propagation
 
 #### Automated
 
-- [ ] 3.1 TypeScript compiles after auth form propagation changes
-- [ ] 3.2 Lint passes after auth form propagation changes
+- [x] 3.1 TypeScript compiles after auth form propagation changes
+- [x] 3.2 Lint passes after auth form propagation changes
 
 #### Manual
 
-- [ ] 3.3 Sign-in with returnTo `/` returns user to `/`
-- [ ] 3.4 Sign-in with returnTo `/classes` returns user to `/classes`
-- [ ] 3.5 Switching auth pages preserves returnTo context
+- [x] 3.3 Sign-in with returnTo `/` returns user to `/`
+- [x] 3.4 Sign-in with returnTo `/classes` returns user to `/classes`
+- [x] 3.5 Switching auth pages preserves returnTo context
