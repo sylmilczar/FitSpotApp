@@ -89,8 +89,8 @@ Apply minimal high-confidence changes in auth pages and auth API handlers. Keep 
 
 #### Automated
 
-- [x] 1.1 TypeScript compiles (`npx tsc --noEmit`)
-- [x] 1.2 Lint passes (`npm run lint`)
+- [x] 1.1 TypeScript compiles (`npx tsc --noEmit`) — d9d8b8c
+- [x] 1.2 Lint passes (`npm run lint`) — d9d8b8c
 
 #### Manual
 
