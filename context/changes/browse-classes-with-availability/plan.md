@@ -126,23 +126,23 @@ Use server-side rendering and keep behavior read-only.
 
 #### Automated
 
-- [x] 1.1 TypeScript compiles (`npx tsc --noEmit`) — pending commit
-- [x] 1.2 Lint passes (`npm run lint`) — pending commit
+- [x] 1.1 TypeScript compiles (`npx tsc --noEmit`) — 381ea38
+- [x] 1.2 Lint passes (`npm run lint`) — 381ea38
 
 #### Manual
 
-- [x] 1.3 Upcoming classes query makes started classes unavailable
-- [x] 1.4 Available spots formula matches DB values
+- [x] 1.3 Upcoming classes query makes started classes unavailable — 381ea38
+- [x] 1.4 Available spots formula matches DB values — 381ea38
 
 ### Phase 2: Browse pages and UI
 
 #### Automated
 
-- [x] 2.1 TypeScript compiles after UI pages — pending commit
-- [x] 2.2 Lint passes after UI pages — pending commit
+- [x] 2.1 TypeScript compiles after UI pages — 381ea38
+- [x] 2.2 Lint passes after UI pages — 381ea38
 
 #### Manual
 
-- [x] 2.3 Guest can browse classes list
-- [x] 2.4 Guest can open class details
-- [x] 2.5 UI conforms to ui-design palette and spacing
+- [x] 2.3 Guest can browse classes list — 381ea38
+- [x] 2.4 Guest can open class details — 381ea38
+- [x] 2.5 UI conforms to ui-design palette and spacing — 381ea38
