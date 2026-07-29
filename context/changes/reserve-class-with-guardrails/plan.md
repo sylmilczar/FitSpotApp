@@ -257,28 +257,30 @@ Phase gates for this change are TypeScript, lint, and manual verification listed
 
 #### Automated
 
-- [x] 1.1 TypeScript compiles (`npx tsc --noEmit`)
-- [x] 1.2 Lint passes (`npm run lint`)
-- [x] 1.3 New migration applies cleanly in local reset flow
+- [x] 1.1 TypeScript compiles (`npx tsc --noEmit`) — a6d2a84
+- [x] 1.2 Lint passes (`npm run lint`) — a6d2a84
+- [x] 1.3 New migration applies cleanly in local reset flow — a6d2a84
 
 #### Manual
 
-- [x] 1.4 Reservation API result mapping covers success and guardrails
-- [x] 1.5 Upcoming reservations RPC is user-scoped in 7-day window
+- [x] 1.4 Reservation API result mapping covers success and guardrails — a6d2a84
+- [x] 1.5 Upcoming reservations RPC is user-scoped in 7-day window — a6d2a84
 
 ### Phase 2: Reservation Action UX on Class Details
 
 #### Automated
 
-- [ ] 2.1 TypeScript compiles after class-details reservation integration
-- [ ] 2.2 Lint passes after class-details reservation integration
+- [x] 2.1 TypeScript compiles after class-details reservation integration
+- [x] 2.2 Lint passes after class-details reservation integration
 
 #### Manual
 
-- [ ] 2.3 Guest reserve redirects to signin and returns to same class
-- [ ] 2.4 Success reserve shows dedicated modal message
-- [ ] 2.5 Guardrail codes show correct modal messages
-- [ ] 2.6 Double-submit does not create duplicate reservations
+- [x] 2.3 Guest reserve redirects to signin and returns to same class
+- [x] 2.4 Success reserve shows dedicated modal message
+- [x] 2.5 Guardrail codes show correct modal messages
+- [x] 2.6 Double-submit does not create duplicate reservations
+- [x] 2.7 Closing modal clears reserve result query params
+- [x] 2.8 Reservation API auth context and signin redirect path are preserved
 
 ### Phase 3: "My Upcoming" Section on Classes Page
 

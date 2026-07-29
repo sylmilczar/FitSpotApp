@@ -1,10 +1,29 @@
 ---
 import Topbar from "@/components/Topbar.astro";
+import { getUserUpcomingReservations } from "@/lib/booking.handler";
 import type { ClassListItem } from "@/types";
 import { listUpcomingClasses } from "@/lib/classes.handler";
+import { createClient } from "@/lib/supabase";
 import Layout from "@/layouts/Layout.astro";
 
 const result = await listUpcomingClasses();
+const currentUser = Astro.locals.user;
+
+const reservedClassIds = new Set<string>();
+
+if (currentUser) {
+  const supabase = createClient(Astro.request.headers, Astro.cookies);
+
+  if (supabase) {
+    const upcomingReservationsResult = await getUserUpcomingReservations(supabase, currentUser.id);
+
+    if (upcomingReservationsResult.ok) {
+      for (const reservation of upcomingReservationsResult.data) {
+        reservedClassIds.add(reservation.classId);
+      }
+    }
+  }
+}
 
 const hours = Array.from({ length: 14 }, (_, idx) => idx + 8);
 const dayStart = new Date();
@@ -90,6 +109,7 @@ function formatClassTime(startsAtIso: string) {
                               <div class="space-y-2">
                                 {classesInCell.map((classItem) => {
                                   const isUnavailable = classItem.isStarted || classItem.isFull;
+                                  const isReserved = reservedClassIds.has(classItem.id);
 
                                   return (
                                     <a
@@ -104,7 +124,14 @@ function formatClassTime(startsAtIso: string) {
                                       <p class="text-xs font-semibold tracking-wide uppercase">
                                         {formatClassTime(classItem.startsAt)}
                                       </p>
-                                      <p class="mt-1 text-sm font-semibold">{classItem.name}</p>
+                                      <p class="mt-1 flex items-center gap-2 text-sm font-semibold">
+                                        <span>{classItem.name}</span>
+                                        {isReserved ? (
+                                          <span title="Reserved" aria-label="Reserved">
+                                            ☑️
+                                          </span>
+                                        ) : null}
+                                      </p>
                                       <p class="mt-1 text-xs">
                                         {isUnavailable
                                           ? "Unavailable"

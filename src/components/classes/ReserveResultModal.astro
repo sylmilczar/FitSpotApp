@@ -1,0 +1,67 @@
+---
+import type { ReservationActionResultCode } from "@/types";
+
+interface Props {
+  result: ReservationActionResultCode;
+  closeHref: string;
+}
+
+const { result, closeHref } = Astro.props;
+
+const contentByResult: Record<
+  ReservationActionResultCode,
+  { title: string; description: string; toneClassName: string }
+> = {
+  RESERVED: {
+    title: "Reservation confirmed",
+    description: "Your spot has been reserved successfully.",
+    toneClassName: "border-[#D9DEB8] bg-[#F4F7E9] text-[#3E4A2A]",
+  },
+  CLASS_FULL: {
+    title: "Class is full",
+    description: "This class has no spots left right now.",
+    toneClassName: "border-[#D7A441]/30 bg-[#FFF8EB] text-[#7A5A1F]",
+  },
+  ALREADY_RESERVED: {
+    title: "Already reserved",
+    description: "You already have a reservation for this class.",
+    toneClassName: "border-[#D7A441]/30 bg-[#FFF8EB] text-[#7A5A1F]",
+  },
+  CLASS_STARTED: {
+    title: "Class already started",
+    description: "Reservations are closed after class start time.",
+    toneClassName: "border-[#C95B5B]/30 bg-[#FFF0F0] text-[#8E4040]",
+  },
+  UNKNOWN: {
+    title: "Reservation unavailable",
+    description: "We could not complete your reservation. Please try again.",
+    toneClassName: "border-[#C95B5B]/30 bg-[#FFF0F0] text-[#8E4040]",
+  },
+};
+
+const modalContent = contentByResult[result];
+---
+
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+  <section
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="reserve-modal-title"
+    class:list={[
+      "w-full max-w-md rounded-2xl border p-6 shadow-[0_18px_40px_rgba(0,0,0,0.2)]",
+      modalContent.toneClassName,
+    ]}
+  >
+    <h2 id="reserve-modal-title" class="text-xl font-bold">{modalContent.title}</h2>
+    <p class="mt-3 text-sm leading-6">{modalContent.description}</p>
+
+    <div class="mt-6 flex justify-end">
+      <a
+        href={closeHref}
+        class="inline-flex items-center rounded-xl border border-current/20 px-4 py-2 text-sm font-semibold transition hover:opacity-85"
+      >
+        Close
+      </a>
+    </div>
+  </section>
+</div>

@@ -5,8 +5,10 @@ import { createClient } from "@/lib/supabase";
 import type { ReservationActionResultCode } from "@/types";
 import { z } from "zod";
 
+const uuidLikeRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const reserveSchema = z.object({
-  classId: z.uuid(),
+  classId: z.string().regex(uuidLikeRegex),
   returnTo: z.string().optional(),
 });
 

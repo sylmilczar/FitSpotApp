@@ -1,8 +1,12 @@
 ---
+import ReserveResultModal from "@/components/classes/ReserveResultModal.astro";
 import ClassStatusBadge from "@/components/classes/ClassStatusBadge.astro";
 import Topbar from "@/components/Topbar.astro";
+import { getUserUpcomingReservations } from "@/lib/booking.handler";
 import { getClassDetailsById } from "@/lib/classes.handler";
+import { createClient } from "@/lib/supabase";
 import Layout from "@/layouts/Layout.astro";
+import type { ReservationActionResultCode } from "@/types";
 
 const classId = Astro.params.id ?? "";
 const isUuidLike = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(classId);
@@ -18,6 +22,38 @@ if (!result.ok && result.reason === "not_found") {
 const classItem = result.ok ? result.data : null;
 const startsAt = classItem ? new Date(classItem.startsAt) : null;
 const isStarted = startsAt ? startsAt.getTime() <= Date.now() : false;
+const classDetailsPath = classItem ? `/classes/${classItem.id}` : "/classes";
+const currentUser = Astro.locals.user;
+
+let alreadyReservedByCurrentUser = false;
+
+if (classItem && currentUser) {
+  const supabase = createClient(Astro.request.headers, Astro.cookies);
+
+  if (supabase) {
+    const upcomingReservationsResult = await getUserUpcomingReservations(supabase, currentUser.id);
+
+    if (upcomingReservationsResult.ok) {
+      alreadyReservedByCurrentUser = upcomingReservationsResult.data.some(
+        (reservation) => reservation.classId === classItem.id,
+      );
+    }
+  }
+}
+
+const reserveResultParam = Astro.url.searchParams.get("reserveResult");
+
+function isReservationResultCode(value: string | null): value is ReservationActionResultCode {
+  return (
+    value === "RESERVED" ||
+    value === "CLASS_FULL" ||
+    value === "ALREADY_RESERVED" ||
+    value === "CLASS_STARTED" ||
+    value === "UNKNOWN"
+  );
+}
+
+const reserveResult = isReservationResultCode(reserveResultParam) ? reserveResultParam : null;
 
 const dateLabel = startsAt
   ? new Intl.DateTimeFormat("en-US", {
@@ -78,10 +114,34 @@ const dateLabel = startsAt
               <p class="mt-6 rounded-2xl border border-[#D7A441]/30 bg-[#D7A441]/15 px-4 py-3 text-sm font-medium text-[#7A5A1F]">
                 This class is currently full. Try another upcoming session.
               </p>
-            ) : (
-              <p class="mt-6 rounded-2xl border border-[#D9DEB8] bg-[#D9DEB8]/35 px-4 py-3 text-sm font-medium text-[#4F5A37]">
-                Spots are available for this class.
+            ) : alreadyReservedByCurrentUser ? (
+              <p class="mt-6 rounded-2xl border border-[#4F5A37]/25 bg-[#EDF3DF] px-4 py-3 text-sm font-medium text-[#3E4A2A]">
+                You already reserved this class.
               </p>
+            ) : (
+              <div class="mt-6 rounded-2xl border border-[#D9DEB8] bg-[#D9DEB8]/35 px-4 py-4">
+                <p class="text-sm font-medium text-[#4F5A37]">Spots are available for this class.</p>
+                {currentUser ? (
+                  <form method="post" action="/api/reservations/create" class="mt-4" data-reserve-form>
+                    <input type="hidden" name="classId" value={classItem.id} />
+                    <input type="hidden" name="returnTo" value={classDetailsPath} />
+                    <button
+                      type="submit"
+                      data-reserve-submit
+                      class="inline-flex items-center rounded-xl bg-[#4F5A37] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3E4A2A] disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      Reserve spot
+                    </button>
+                  </form>
+                ) : (
+                  <a
+                    href={`/auth/signin?returnTo=${encodeURIComponent(classDetailsPath)}`}
+                    class="mt-4 inline-flex items-center rounded-xl bg-[#4F5A37] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3E4A2A]"
+                  >
+                    Sign in to reserve
+                  </a>
+                )}
+              </div>
             )}
           </article>
         ) : result.reason === "not_found" ? (
@@ -99,5 +159,30 @@ const dateLabel = startsAt
         )
       }
     </section>
+
+    {classItem && reserveResult ? <ReserveResultModal result={reserveResult} closeHref={classDetailsPath} /> : null}
   </main>
+
+  <script is:inline>
+    const reserveForms = document.querySelectorAll("[data-reserve-form]");
+
+    reserveForms.forEach((form) => {
+      form.addEventListener("submit", (event) => {
+        const submitButton = form.querySelector("[data-reserve-submit]");
+
+        if (!(submitButton instanceof HTMLButtonElement)) {
+          return;
+        }
+
+        if (submitButton.dataset.pending === "true") {
+          event.preventDefault();
+          return;
+        }
+
+        submitButton.dataset.pending = "true";
+        submitButton.disabled = true;
+        submitButton.textContent = "Reserving...";
+      });
+    });
+  </script>
 </Layout>
