@@ -1,10 +1,10 @@
 ---
-change_id: reserve-class-with-guardrails
-title: Reserve class with guardrails
-status: implementing
+change_id: app-routing-foundation
+title: App routing foundation
+status: archived
 created: 2026-07-29
 updated: 2026-07-29
-archived_at: null
+archived_at: 2026-07-29T16:35:54Z
 ---
 
 ## Notes

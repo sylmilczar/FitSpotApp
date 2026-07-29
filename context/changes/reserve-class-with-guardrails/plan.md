@@ -257,14 +257,14 @@ Phase gates for this change are TypeScript, lint, and manual verification listed
 
 #### Automated
 
-- [ ] 1.1 TypeScript compiles (`npx tsc --noEmit`)
-- [ ] 1.2 Lint passes (`npm run lint`)
-- [ ] 1.3 New migration applies cleanly in local reset flow
+- [x] 1.1 TypeScript compiles (`npx tsc --noEmit`)
+- [x] 1.2 Lint passes (`npm run lint`)
+- [x] 1.3 New migration applies cleanly in local reset flow
 
 #### Manual
 
-- [ ] 1.4 Reservation API result mapping covers success and guardrails
-- [ ] 1.5 Upcoming reservations RPC is user-scoped in 7-day window
+- [x] 1.4 Reservation API result mapping covers success and guardrails
+- [x] 1.5 Upcoming reservations RPC is user-scoped in 7-day window
 
 ### Phase 2: Reservation Action UX on Class Details
 
