@@ -286,12 +286,12 @@ Phase gates for this change are TypeScript, lint, and manual verification listed
 
 #### Automated
 
-- [ ] 3.1 TypeScript compiles after `/classes` upcoming integration
-- [ ] 3.2 Lint passes after `/classes` upcoming integration
+- [x] 3.1 TypeScript compiles after `/classes` upcoming integration
+- [x] 3.2 Lint passes after `/classes` upcoming integration
 
 #### Manual
 
-- [ ] 3.3 Authenticated user sees "my upcoming" section on `/classes`
-- [ ] 3.4 Section shows only logged-in user's 7-day reservations
-- [ ] 3.5 Guest does not see "my upcoming" section
-- [ ] 3.6 Availability and reservations remain consistent after booking
+- [x] 3.3 Authenticated user sees "my upcoming" section on `/classes`
+- [x] 3.4 Section shows only logged-in user's 7-day reservations
+- [x] 3.5 Guest does not see "my upcoming" section
+- [x] 3.6 Availability and reservations remain consistent after booking

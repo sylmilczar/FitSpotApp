@@ -95,15 +95,23 @@ function formatClassTime(startsAtIso: string) {
         </p>
       </header>
 
-      {currentUser && upcomingReservationsLoadState === "ok" ? <UpcomingReservationsPanel reservations={upcomingReservations} /> : null}
+      {
+        currentUser && upcomingReservationsLoadState === "ok" ? (
+          <UpcomingReservationsPanel reservations={upcomingReservations} />
+        ) : null
+      }
 
-      {currentUser && upcomingReservationsLoadState === "error" ? (
-        <section class="mb-8 rounded-2xl border border-[#D7A441]/30 bg-[#FFF8EB] p-6 text-[#7A5A1F]">
-          <h2 class="text-lg font-semibold">My upcoming reservations</h2>
-          <p class="mt-2 text-sm">Could not load your reservations right now. Please refresh in a moment.</p>
-          {upcomingReservationsErrorMessage ? <p class="mt-2 text-xs opacity-70">{upcomingReservationsErrorMessage}</p> : null}
-        </section>
-      ) : null}
+      {
+        currentUser && upcomingReservationsLoadState === "error" ? (
+          <section class="mb-8 rounded-2xl border border-[#D7A441]/30 bg-[#FFF8EB] p-6 text-[#7A5A1F]">
+            <h2 class="text-lg font-semibold">My upcoming reservations</h2>
+            <p class="mt-2 text-sm">Could not load your reservations right now. Please refresh in a moment.</p>
+            {upcomingReservationsErrorMessage ? (
+              <p class="mt-2 text-xs opacity-70">{upcomingReservationsErrorMessage}</p>
+            ) : null}
+          </section>
+        ) : null
+      }
 
       {
         result.ok ? (
