@@ -8,7 +8,7 @@ S-04 adds the club operations surface: managers and admins can manage all classe
 
 ## Desired End State
 
-Privileged staff use `/manager/classes` to create, edit, and either delete or cancel classes, then open an attendee view showing email, reservation status, and reservation time. Classes with no reservations can be deleted; classes with reservation history remain in history and are cancelled instead. Cancelled classes stay visible in public class views with a clear `CANCELLED` label, but cannot be reserved.
+Privileged staff use `/manager/classes` to create, edit, and either delete or cancel classes, then open an attendee view showing email, reservation status, and reservation time. Classes with no reservations can be deleted; classes with reservation history remain in history and are cancelled instead. Cancelled classes are hidden from guests and users without a reservation, but remain visible to enrolled users with a clear `CANCELLED` label and cannot be reserved.
 
 ## Key Decisions
 
@@ -57,5 +57,5 @@ Privileged staff use `/manager/classes` to create, edit, and either delete or ca
 
 - The single-club model intentionally allows any manager to manage all classes.
 - Attendee email projection must remain restricted to manager/admin callers.
-- Cancelled classes remain readable to staff and clients with a `CANCELLED` status, but are excluded from reservation actions.
+- Cancelled classes remain readable to staff and users with reservation history, with a `CANCELLED` status, but are excluded from reservation actions.
 - Existing reservation rows remain valid history after class cancellation.

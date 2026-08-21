@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { BookingContractResult, BookingGuardrailCode, UpcomingReservationItem } from "@/types";
 
-const GUARDRAIL_CODES: BookingGuardrailCode[] = ["CLASS_FULL", "ALREADY_RESERVED", "CLASS_STARTED"];
+const GUARDRAIL_CODES: BookingGuardrailCode[] = ["CLASS_FULL", "ALREADY_RESERVED", "CLASS_STARTED", "CLASS_CANCELLED"];
 
 function extractGuardrailCode(message: string): BookingGuardrailCode | "UNKNOWN" {
   const upper = message.toUpperCase();

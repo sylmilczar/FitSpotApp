@@ -18,7 +18,7 @@ The classes table, role model, middleware role resolution, and manager/admin RLS
 
 ## Desired End State
 
-A manager or admin can open `/manager/classes`, see active and cancelled classes, create a future class, edit a class, choose deletion for a class with no reservations, choose cancellation for a class with reservation history, and open an attendee view showing email, reservation status, and reservation time. Clients and guests are redirected away from the manager namespace. Cancelled classes remain in the database and attendee history remains visible. Public class views keep cancelled classes visible with a `CANCELLED` status, while reservation actions are disabled.
+A manager or admin can open `/manager/classes`, see active and cancelled classes, create a future class, edit a class, choose deletion for a class with no reservations, choose cancellation for a class with reservation history, and open an attendee view showing email, reservation status, and reservation time. Clients and guests are redirected away from the manager namespace. Cancelled classes remain in the database and attendee history remains visible. The public schedule excludes cancelled classes for guests and users without a reservation; a user with reservation history for a cancelled class sees it with `CANCELLED` status and no reservation action. Managers/admins see all statuses in the staff workspace.
 
 ## What We're NOT Doing
 
@@ -35,7 +35,7 @@ Add an explicit `class_status` enum with `scheduled/cancelled`, a manager/admin-
 
 ## Critical Implementation Details
 
-`starts_at` is entered as browser-local `datetime-local` and converted to an ISO UTC timestamp before persistence. Public class read models return both statuses so the frontend can show `CANCELLED`; manager views include both statuses. Cancelling a class changes status and never deletes its reservations. Hard deletion is allowed only when reservation count is zero.
+`starts_at` is entered as browser-local `datetime-local` and converted to an ISO UTC timestamp before persistence. The public schedule remains scheduled-only; a separate authenticated user-scoped read model may include cancelled classes only when the current user has reservation history for them. Manager views include both statuses. Cancelling a class changes status and never deletes its reservations. Hard deletion is allowed only when reservation count is zero.
 
 ## Phase 1: Class Status and Attendee Read Models
 
@@ -51,7 +51,7 @@ Introduce the database contracts needed for non-destructive class cancellation a
 
 **Intent**: Add explicit class lifecycle state without deleting historical rows.
 
-**Contract**: Create `public.class_status` enum with `scheduled` and `cancelled`, add `status public.class_status not null default 'scheduled'` to `public.classes`, and update public class availability/details functions to return status so frontend views can label cancelled classes without making them reservable.
+**Contract**: Create `public.class_status` enum with `scheduled` and `cancelled`, add `status public.class_status not null default 'scheduled'` to `public.classes`, and update public class availability/details functions to return status so frontend views can label cancelled classes without making them reservable. Because the table return type changes, the migration must drop and recreate those functions while preserving grants.
 
 #### 2. Attendee read model
 
@@ -89,7 +89,7 @@ Introduce the database contracts needed for non-destructive class cancellation a
 
 - A manager/admin can call the attendee RPC for a class and sees confirmed plus cancelled rows.
 - A client/guest cannot call the attendee RPC.
-- Public `/classes` retains cancelled classes with a `CANCELLED` status and no reservation action, while manager data can still include them.
+- Public `/classes` excludes cancelled classes for guests and users without a reservation; enrolled users see their cancelled reservations with `CANCELLED` status and no reservation action, while manager data includes all statuses.
 
 **Implementation Note**: Pause for manual confirmation after automated checks pass.
 
@@ -133,7 +133,7 @@ Add a dedicated mutation handler layer with shared validation and capacity safet
 
 **Intent**: Keep public read contracts consistent with cancelled class visibility and status typing.
 
-**Contract**: Public list/details return both scheduled and cancelled classes with typed status; manager list uses a separate handler/query that includes both statuses.
+**Contract**: Public list/details remain scheduled-only; the authenticated user-scoped reservation read model returns cancelled classes only when the current user has reservation history; manager list uses a separate handler/query that includes both statuses.
 
 ### Success Criteria:
 
@@ -246,7 +246,7 @@ Build the staff-facing SSR workspace with class forms, status visibility, and at
 
 - Manager/admin can use the complete CRUD workflow from `/manager/classes`.
 - Attendee view shows confirmed and cancelled rows with correct email/status/time.
-- Cancelled classes remain visible publicly and to staff with a `CANCELLED` status, but cannot be reserved.
+- Cancelled classes are visible only to enrolled users and staff with a `CANCELLED` status, and cannot be reserved.
 - Client/guest cannot see privileged navigation or access manager pages.
 - Manager sees delete for empty classes and cancel for classes with reservation history.
 
@@ -300,15 +300,15 @@ The status migration is additive and preserves existing classes as `scheduled`. 
 
 #### Automated
 
-- [ ] 1.1 Supabase reset applies all migrations
-- [ ] 1.2 TypeScript compiles (`npx tsc --noEmit`)
-- [ ] 1.3 Lint passes (`npm run lint`)
+- [x] 1.1 Supabase reset applies all migrations
+- [x] 1.2 TypeScript compiles (`npx tsc --noEmit`)
+- [x] 1.3 Lint passes (`npm run lint`)
 
 #### Manual
 
-- [ ] 1.4 Attendee RPC returns confirmed and cancelled rows for manager/admin
-- [ ] 1.5 Client/guest cannot call attendee RPC
-- [ ] 1.6 Public classes retain cancelled classes with `CANCELLED` status and no reservation action
+- [x] 1.4 Attendee RPC returns confirmed and cancelled rows for manager/admin
+- [x] 1.5 Client/guest cannot call attendee RPC
+- [x] 1.6 Public schedule hides cancelled classes unless the authenticated user has reservation history; enrolled users see `CANCELLED` with no reservation action
 
 ### Phase 2: Class Management Handlers and Validation
 
@@ -352,6 +352,6 @@ The status migration is additive and preserves existing classes as `scheduled`. 
 
 - [ ] 4.4 Manager/admin complete CRUD workflow works
 - [ ] 4.5 Attendee view shows correct confirmed/cancelled data
-- [ ] 4.6 Cancelled classes remain visible publicly with `CANCELLED` status and visible to staff
+- [ ] 4.6 Cancelled classes are visible only to enrolled users and staff with `CANCELLED` status
 - [ ] 4.7 Privileged navigation and route protection work for roles
 - [ ] 4.8 Manager can choose delete for empty classes or cancel for classes with reservations

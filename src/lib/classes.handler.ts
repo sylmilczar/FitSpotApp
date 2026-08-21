@@ -1,6 +1,6 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_KEY, SUPABASE_URL } from "astro:env/server";
-import type { ClassDetailsView, ClassListItem } from "@/types";
+import type { ClassDetailsView, ClassListItem, ClassStatus } from "@/types";
 
 type ListUpcomingClassesResult = { ok: true; data: ClassListItem[] } | { ok: false; message: string };
 
@@ -16,6 +16,7 @@ interface ClassAvailabilityRow {
   confirmed_reservations_count: number;
   available_spots: number;
   is_full: boolean;
+  status: ClassStatus;
 }
 
 interface RpcError {
@@ -59,6 +60,7 @@ function mapClassRow(row: ClassAvailabilityRow): ClassListItem {
     availableSpots: Math.max(row.available_spots, 0),
     isFull: row.is_full,
     isStarted: new Date(row.starts_at).getTime() <= Date.now(),
+    status: row.status,
   };
 }
 

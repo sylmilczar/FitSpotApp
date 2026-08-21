@@ -1,7 +1,7 @@
 ---
 change_id: manager-manage-classes-and-attendees
 title: Manager class and attendee management
-status: plan_reviewed
+status: implementing
 created: 2026-07-29
 updated: 2026-08-21
 archived_at: null
