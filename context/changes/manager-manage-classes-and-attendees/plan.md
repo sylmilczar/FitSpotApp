@@ -300,15 +300,15 @@ The status migration is additive and preserves existing classes as `scheduled`. 
 
 #### Automated
 
-- [x] 1.1 Supabase reset applies all migrations
-- [x] 1.2 TypeScript compiles (`npx tsc --noEmit`)
-- [x] 1.3 Lint passes (`npm run lint`)
+- [x] 1.1 Supabase reset applies all migrations — bdc9f33
+- [x] 1.2 TypeScript compiles (`npx tsc --noEmit`) — bdc9f33
+- [x] 1.3 Lint passes (`npm run lint`) — bdc9f33
 
 #### Manual
 
-- [x] 1.4 Attendee RPC returns confirmed and cancelled rows for manager/admin
-- [x] 1.5 Client/guest cannot call attendee RPC
-- [x] 1.6 Public schedule hides cancelled classes unless the authenticated user has reservation history; enrolled users see `CANCELLED` with no reservation action
+- [x] 1.4 Attendee RPC returns confirmed and cancelled rows for manager/admin — bdc9f33
+- [x] 1.5 Client/guest cannot call attendee RPC — bdc9f33
+- [x] 1.6 Public schedule hides cancelled classes unless the authenticated user has reservation history; enrolled users see `CANCELLED` with no reservation action — bdc9f33
 
 ### Phase 2: Class Management Handlers and Validation
 
