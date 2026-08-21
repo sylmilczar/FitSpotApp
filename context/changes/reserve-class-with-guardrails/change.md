@@ -1,7 +1,7 @@
 ---
 change_id: reserve-class-with-guardrails
 title: Reserve class with guardrails
-status: implementing
+status: implemented
 created: 2026-07-29
 updated: 2026-07-29
 archived_at: null
