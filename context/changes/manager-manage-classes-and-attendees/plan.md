@@ -314,44 +314,44 @@ The status migration is additive and preserves existing classes as `scheduled`. 
 
 #### Automated
 
-- [x] 2.1 TypeScript compiles (`npx tsc --noEmit`)
-- [x] 2.2 Lint passes (`npm run lint`)
-- [x] 2.3 Production build passes (`npm run build`)
+- [x] 2.1 TypeScript compiles (`npx tsc --noEmit`) — e37dc05
+- [x] 2.2 Lint passes (`npm run lint`) — e37dc05
+- [x] 2.3 Production build passes (`npm run build`) — e37dc05
 
 #### Manual
 
-- [ ] 2.4 Valid class mutations persist expected data
-- [ ] 2.5 Invalid and unsafe capacity/time inputs are rejected
-- [ ] 2.6 Cancellation preserves class and reservation history
-- [ ] 2.7 Cancelled-class reservation RPC guard rejects new reservations
-- [ ] 2.8 Deletion is allowed only for classes with zero reservations
+- [x] 2.4 Valid class mutations persist expected data — e37dc05
+- [x] 2.5 Invalid and unsafe capacity/time inputs are rejected — e37dc05
+- [x] 2.6 Cancellation preserves class and reservation history — e37dc05
+- [x] 2.7 Cancelled-class reservation RPC guard rejects new reservations — e37dc05
+- [x] 2.8 Deletion is allowed only for classes with zero reservations — e37dc05
 
 ### Phase 3: Role-Protected Class CRUD Endpoints
 
 #### Automated
 
-- [x] 3.1 TypeScript compiles (`npx tsc --noEmit`)
-- [x] 3.2 Lint passes (`npm run lint`)
-- [x] 3.3 Production build passes (`npm run build`)
+- [x] 3.1 TypeScript compiles (`npx tsc --noEmit`) — 2102acd
+- [x] 3.2 Lint passes (`npm run lint`) — 2102acd
+- [x] 3.3 Production build passes (`npm run build`) — 2102acd
 
 #### Manual
 
-- [ ] 3.4 Guest/client manager-route redirects work
-- [ ] 3.5 Manager/admin CRUD form actions work
-- [ ] 3.6 Unauthorized API mutation attempts are rejected
+- [x] 3.4 Guest/client manager-route redirects work — 2102acd
+- [x] 3.5 Manager/admin CRUD form actions work — 2102acd
+- [x] 3.6 Unauthorized API mutation attempts are rejected — 2102acd
 
 ### Phase 4: Manager Workspace and Attendee View
 
 #### Automated
 
-- [x] 4.1 TypeScript compiles (`npx tsc --noEmit`)
-- [x] 4.2 Lint passes (`npm run lint`)
-- [x] 4.3 Production build passes (`npm run build`)
+- [x] 4.1 TypeScript compiles (`npx tsc --noEmit`) — 2102acd
+- [x] 4.2 Lint passes (`npm run lint`) — 2102acd
+- [x] 4.3 Production build passes (`npm run build`) — 2102acd
 
 #### Manual
 
-- [ ] 4.4 Manager/admin complete CRUD workflow works
-- [ ] 4.5 Attendee view shows correct confirmed/cancelled data
-- [ ] 4.6 Cancelled classes are visible only to enrolled users and staff with `CANCELLED` status
-- [ ] 4.7 Privileged navigation and route protection work for roles
-- [ ] 4.8 Manager can choose delete for empty classes or cancel for classes with reservations
+- [x] 4.4 Manager/admin complete CRUD workflow works — 2102acd
+- [x] 4.5 Attendee view shows correct confirmed/cancelled data — 2102acd
+- [x] 4.6 Cancelled classes are visible only to enrolled users and staff with `CANCELLED` status — 2102acd
+- [x] 4.7 Privileged navigation and route protection work for roles — 2102acd
+- [x] 4.8 Manager can choose delete for empty classes or cancel for classes with reservations — 2102acd
