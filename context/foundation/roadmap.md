@@ -3,7 +3,7 @@ project: FitSpotApp for a Small Fitness Club
 version: 1
 status: draft
 created: 2026-06-29
-updated: 2026-07-29
+updated: 2026-08-21
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -33,7 +33,7 @@ W obecnym stanie rezerwacje zajec sa rozproszone miedzy telefon i komunikatory, 
 | F-02 | admin-access-foundation | (foundation) minimalny kontrakt uprawnien dla roli client/manager/admin jest gotowy | — | Access Control, FR-008, FR-009, FR-010 | done |
 | F-03 | app-routing-foundation | (foundation) user niezalogowany trafia na publiczna strone glowna i moze przejsc do auth lub grafiku zajec; dashboard nie jest czescia glownego flow | S-01 | FR-001, FR-002, FR-003 | done |
 | S-01 | client-auth-journey | user can create an account and sign in to enter protected booking flow | — | FR-001, FR-002 | done |
-| S-02 | reserve-class-with-guardrails | user can reserve an eligible class and see it in upcoming reservations with spot updates | S-01, S-03, F-01, F-02 | US-01, FR-005, FR-007, Non-Functional Requirements | proposed |
+| S-02 | reserve-class-with-guardrails | user can reserve an eligible class and see it in upcoming reservations with spot updates | S-01, S-03, F-01, F-02 | US-01, FR-005, FR-007, Non-Functional Requirements | done |
 | S-03 | browse-classes-with-availability | user can browse upcoming classes and view available spots in class details | F-01, F-03 | FR-003, FR-004 | done |
 | S-04 | manager-manage-classes-and-attendees | manager (and admin as superset) can manage classes and view class attendees | S-01, F-01, F-02 | FR-008, FR-009 | proposed |
 | S-05 | admin-manage-users-and-roles | admin can manage users and assign roles for operations | S-01, F-02 | FR-010, Access Control | proposed |
@@ -138,7 +138,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** To glowna walidacja produktu; odkladanie jej utrzymuje najwyzsze ryzyko bez nauki z realnego przeplywu.
-- **Status:** proposed
+- **Status:** done
 
 ### S-04: Zarzadzanie zajeciami i uczestnikami przez managera
 
@@ -202,5 +202,7 @@ This table is the clean handoff to Jira/Linear or any MCP-backed backlog. Includ
 - **F-03: (foundation) user niezalogowany trafia na publiczna strone glowna i moze przejsc do auth lub grafiku zajec; dashboard nie jest czescia glownego flow.** - Archived 2026-07-29 -> `context/archive/2026-07-29-app-routing-foundation/`. Lesson: —.
 
 - **S-03: user can browse upcoming classes and view available spots in class details.** - Archived 2026-07-29 -> `context/archive/2026-07-29-browse-classes-with-availability/`. Lesson: —.
+
+- **S-02: user can reserve an eligible class and see it in upcoming reservations with spot updates.** - Archived 2026-08-21 -> `context/archive/2026-07-29-reserve-class-with-guardrails/`. Lesson: —.
 
 - **<Slice ID>: <Outcome>** - Archived <YYYY-MM-DD> -> context/archive/<YYYY-MM-DD-change-id>/. Lesson: <pointer to lessons.md if any, or ->.
