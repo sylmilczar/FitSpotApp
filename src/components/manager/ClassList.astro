@@ -1,0 +1,62 @@
+---
+import type { ManagerClassItem } from "@/lib/classes.mutation.handler";
+
+interface Props {
+  classes: ManagerClassItem[];
+}
+
+const { classes } = Astro.props;
+---
+
+<div class="space-y-3">
+  {
+    classes.length === 0 ? (
+      <p class="rounded-xl border border-[#E6E6DD] bg-white p-5 text-sm text-[#67675F]">No classes found.</p>
+    ) : null
+  }
+  {
+    classes.map((classItem) => (
+      <article class="rounded-2xl border border-[#E6E6DD] bg-white p-5 shadow-[0_8px_20px_rgba(79,90,55,0.06)]">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-semibold text-[#1F1F1A]">{classItem.name}</h2>
+            <p class="mt-1 text-sm text-[#67675F]">{new Date(classItem.startsAt).toLocaleString()}</p>
+            <p class="mt-2 text-xs text-[#67675F]">
+              {classItem.confirmedReservationsCount}/{classItem.capacity} confirmed · {classItem.reservationCount}{" "}
+              reservation records
+            </p>
+          </div>
+          <span
+            class:list={[
+              "rounded-lg px-2 py-1 text-xs font-semibold uppercase",
+              classItem.status === "cancelled" ? "bg-[#FFF0F0] text-[#8E4040]" : "bg-[#EDF3DF] text-[#3E4A2A]",
+            ]}
+          >
+            {classItem.status}
+          </span>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-3 text-sm">
+          <a href={`/manager/classes/${classItem.id}/edit`} class="text-[#4F5A37] underline">
+            Edit
+          </a>
+          <a href={`/manager/classes/${classItem.id}/attendees`} class="text-[#4F5A37] underline">
+            Attendees
+          </a>
+          {classItem.reservationCount === 0 ? (
+            <form method="post" action={`/api/classes/${classItem.id}/delete`}>
+              <button type="submit" class="text-[#8E4040] underline">
+                Delete
+              </button>
+            </form>
+          ) : classItem.status !== "cancelled" ? (
+            <form method="post" action={`/api/classes/${classItem.id}/cancel`}>
+              <button type="submit" class="text-[#8E4040] underline">
+                Cancel class
+              </button>
+            </form>
+          ) : null}
+        </div>
+      </article>
+    ))
+  }
+</div>

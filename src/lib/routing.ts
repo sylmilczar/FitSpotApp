@@ -2,6 +2,8 @@ export const HOME_ROUTE = "/";
 export const CLASSES_ROUTE = "/classes";
 export const AUTH_SIGNIN_ROUTE = "/auth/signin";
 export const AUTH_SIGNUP_ROUTE = "/auth/signup";
+export const MANAGER_ROUTE = "/manager";
+export const MANAGER_CLASSES_ROUTE = "/manager/classes";
 
 function isSafeInternalPath(value: string): boolean {
   if (!value.startsWith("/")) {

@@ -1,0 +1,40 @@
+---
+import type { ClassAttendeeItem } from "@/types";
+
+interface Props {
+  attendees: ClassAttendeeItem[];
+}
+const { attendees } = Astro.props;
+---
+
+<div class="overflow-x-auto rounded-2xl border border-[#E6E6DD] bg-white">
+  <table class="w-full text-left text-sm">
+    <thead class="border-b border-[#E6E6DD] bg-[#F8F8F5]">
+      <tr><th class="px-4 py-3">Email</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Reserved at</th></tr>
+    </thead>
+    <tbody>
+      {
+        attendees.length === 0 ? (
+          <tr>
+            <td colspan="3" class="px-4 py-5 text-[#67675F]">
+              No reservation records.
+            </td>
+          </tr>
+        ) : null
+      }
+      {
+        attendees.map((attendee) => (
+          <tr class="border-b border-[#E6E6DD] last:border-0">
+            <td class="px-4 py-3">{attendee.userEmail}</td>
+            <td class="px-4 py-3">
+              <span class:list={[attendee.status === "cancelled" ? "text-[#8E4040]" : "text-[#3E4A2A]"]}>
+                {attendee.status}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-[#67675F]">{new Date(attendee.createdAt).toLocaleString()}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

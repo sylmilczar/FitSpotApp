@@ -1,0 +1,34 @@
+---
+import AttendeeList from "@/components/manager/AttendeeList.astro";
+import Topbar from "@/components/Topbar.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getClassAttendees, listManagerClasses } from "@/lib/classes.mutation.handler";
+import { createClient } from "@/lib/supabase";
+
+const classId = Astro.params.id ?? "";
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const classesResult = supabase ? await listManagerClasses(supabase) : null;
+const classItem = classesResult?.ok ? classesResult.data.find((item) => item.id === classId) : null;
+const attendeesResult = supabase
+  ? await getClassAttendees(supabase, classId)
+  : { ok: false as const, code: "CONFIG_ERROR", message: "Supabase is not configured." };
+---
+
+<Layout title="Class attendees">
+  <main class="bg-wellness min-h-screen px-4 py-10 sm:px-6">
+    <section class="mx-auto max-w-4xl">
+      <Topbar variant="light" /><a href="/manager/classes" class="text-sm text-[#4F5A37] underline">Back to classes</a
+      ><h1 class="mt-6 text-3xl font-bold text-[#1F1F1A]">{classItem?.name ?? "Class attendees"}</h1><p
+        class="mt-2 mb-6 text-sm text-[#67675F]"
+      >
+        Confirmed and cancelled reservation records.
+      </p>{
+        attendeesResult.ok ? (
+          <AttendeeList attendees={attendeesResult.data} />
+        ) : (
+          <p class="rounded-xl bg-white p-5 text-[#8E4040]">{attendeesResult.message}</p>
+        )
+      }
+    </section>
+  </main>
+</Layout>

@@ -19,6 +19,7 @@ interface UpcomingReservationRow {
   class_name: string;
   class_description: string | null;
   starts_at: string;
+  class_status: "scheduled" | "cancelled";
   capacity: number;
   confirmed_reservations_count: number;
   available_spots: number;
@@ -51,6 +52,7 @@ function mapUpcomingReservationRow(row: UpcomingReservationRow): UpcomingReserva
     className: row.class_name,
     classDescription: row.class_description,
     startsAt: row.starts_at,
+    classStatus: row.class_status,
     capacity: row.capacity,
     confirmedReservationsCount: row.confirmed_reservations_count,
     availableSpots: Math.max(row.available_spots, 0),

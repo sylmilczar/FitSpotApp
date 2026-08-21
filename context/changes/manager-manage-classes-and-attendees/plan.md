@@ -330,9 +330,9 @@ The status migration is additive and preserves existing classes as `scheduled`. 
 
 #### Automated
 
-- [ ] 3.1 TypeScript compiles (`npx tsc --noEmit`)
-- [ ] 3.2 Lint passes (`npm run lint`)
-- [ ] 3.3 Production build passes (`npm run build`)
+- [x] 3.1 TypeScript compiles (`npx tsc --noEmit`)
+- [x] 3.2 Lint passes (`npm run lint`)
+- [x] 3.3 Production build passes (`npm run build`)
 
 #### Manual
 
@@ -344,9 +344,9 @@ The status migration is additive and preserves existing classes as `scheduled`. 
 
 #### Automated
 
-- [ ] 4.1 TypeScript compiles (`npx tsc --noEmit`)
-- [ ] 4.2 Lint passes (`npm run lint`)
-- [ ] 4.3 Production build passes (`npm run build`)
+- [x] 4.1 TypeScript compiles (`npx tsc --noEmit`)
+- [x] 4.2 Lint passes (`npm run lint`)
+- [x] 4.3 Production build passes (`npm run build`)
 
 #### Manual
 

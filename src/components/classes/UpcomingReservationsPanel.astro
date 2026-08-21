@@ -39,8 +39,15 @@ function formatDateLabel(startsAtIso: string): string {
                 <p class="text-sm font-semibold text-[#1F1F1A]">{reservation.className}</p>
                 <p class="mt-1 text-xs text-[#67675F]">{formatDateLabel(reservation.startsAt)}</p>
               </div>
-              <span class="inline-flex items-center rounded-lg border border-[#4F5A37]/20 bg-[#4F5A37]/10 px-2 py-1 text-xs font-semibold text-[#3E4A2A]">
-                Confirmed
+              <span
+                class:list={[
+                  "inline-flex items-center rounded-lg border px-2 py-1 text-xs font-semibold",
+                  reservation.classStatus === "cancelled"
+                    ? "border-[#C95B5B]/30 bg-[#FFF0F0] text-[#8E4040]"
+                    : "border-[#4F5A37]/20 bg-[#4F5A37]/10 text-[#3E4A2A]",
+                ]}
+              >
+                {reservation.classStatus === "cancelled" ? "CANCELLED" : "Confirmed"}
               </span>
             </div>
             <p class="mt-2 text-xs text-[#67675F]">

@@ -1,9 +1,15 @@
 import { defineMiddleware } from "astro:middleware";
 import { createClient } from "@/lib/supabase";
-import { AUTH_SIGNIN_ROUTE, AUTH_SIGNUP_ROUTE, CLASSES_ROUTE, getPostLoginDestination } from "@/lib/routing";
+import {
+  AUTH_SIGNIN_ROUTE,
+  AUTH_SIGNUP_ROUTE,
+  CLASSES_ROUTE,
+  MANAGER_ROUTE,
+  getPostLoginDestination,
+} from "@/lib/routing";
 import type { AppRole } from "@/types";
 
-const ADMIN_ROUTES = ["/admin"];
+const PRIVILEGED_ROUTES = ["/admin", MANAGER_ROUTE];
 const AUTH_PAGES = [AUTH_SIGNIN_ROUTE, AUTH_SIGNUP_ROUTE];
 
 export const onRequest = defineMiddleware(async (context, next) => {
@@ -37,7 +43,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  if (ADMIN_ROUTES.some((route) => context.url.pathname.startsWith(route))) {
+  if (PRIVILEGED_ROUTES.some((route) => context.url.pathname.startsWith(route))) {
     if (!context.locals.user) {
       return context.redirect(AUTH_SIGNIN_ROUTE);
     }

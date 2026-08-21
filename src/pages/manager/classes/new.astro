@@ -1,0 +1,17 @@
+---
+import ClassForm from "@/components/manager/ClassForm.astro";
+import Topbar from "@/components/Topbar.astro";
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout title="New class">
+  <main class="bg-wellness min-h-screen px-4 py-10 sm:px-6">
+    <section class="mx-auto max-w-2xl">
+      <Topbar variant="light" /><a href="/manager/classes" class="text-sm text-[#4F5A37] underline">Back to classes</a
+      ><h1 class="my-6 text-3xl font-bold text-[#1F1F1A]">Create class</h1><ClassForm
+        action="/api/classes/create"
+        submitLabel="Create class"
+      />
+    </section>
+  </main>
+</Layout>

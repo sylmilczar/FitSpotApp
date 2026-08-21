@@ -1,0 +1,36 @@
+---
+import ClassForm from "@/components/manager/ClassForm.astro";
+import Topbar from "@/components/Topbar.astro";
+import Layout from "@/layouts/Layout.astro";
+import { listManagerClasses } from "@/lib/classes.mutation.handler";
+import { createClient } from "@/lib/supabase";
+
+const classId = Astro.params.id ?? "";
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const result = supabase
+  ? await listManagerClasses(supabase)
+  : { ok: false as const, code: "CONFIG_ERROR", message: "Supabase is not configured." };
+const classItem = result.ok ? result.data.find((item) => item.id === classId) : null;
+---
+
+<Layout title="Edit class">
+  <main class="bg-wellness min-h-screen px-4 py-10 sm:px-6">
+    <section class="mx-auto max-w-2xl">
+      <Topbar variant="light" /><a href="/manager/classes" class="text-sm text-[#4F5A37] underline">Back to classes</a
+      ><h1 class="my-6 text-3xl font-bold text-[#1F1F1A]">Edit class</h1>{
+        classItem ? (
+          <ClassForm
+            action={`/api/classes/${classId}/update`}
+            submitLabel="Save changes"
+            className={classItem.name}
+            description={classItem.description}
+            capacity={classItem.capacity}
+            startsAt={classItem.startsAt}
+          />
+        ) : (
+          <p class="rounded-xl bg-white p-5 text-[#8E4040]">Class not found.</p>
+        )
+      }
+    </section>
+  </main>
+</Layout>

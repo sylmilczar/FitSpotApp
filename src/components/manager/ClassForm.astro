@@ -1,0 +1,79 @@
+---
+interface Props {
+  action: string;
+  submitLabel: string;
+  className?: string;
+  description?: string | null;
+  capacity?: number;
+  startsAt?: string;
+  error?: string | null;
+}
+
+const {
+  action,
+  submitLabel,
+  className = "",
+  description = "",
+  capacity = 10,
+  startsAt = "",
+  error = null,
+} = Astro.props;
+const localStartsAt = startsAt ? new Date(startsAt).toISOString().slice(0, 16) : "";
+---
+
+<form
+  method="post"
+  action={action}
+  class="space-y-5 rounded-2xl border border-[#E6E6DD] bg-white p-6 shadow-[0_10px_24px_rgba(79,90,55,0.08)]"
+>
+  {
+    error ? (
+      <p class="rounded-xl border border-[#C95B5B]/30 bg-[#FFF0F0] px-4 py-3 text-sm text-[#8E4040]">{error}</p>
+    ) : null
+  }
+  <label class="block text-sm font-medium text-[#1F1F1A]">
+    Class name
+    <input
+      name="className"
+      required
+      maxlength="120"
+      value={className}
+      class="mt-2 w-full rounded-xl border border-[#D9DEB8] px-3 py-2"
+    />
+  </label>
+  <label class="block text-sm font-medium text-[#1F1F1A]">
+    Description
+    <textarea
+      name="description"
+      maxlength="2000"
+      rows="4"
+      class="mt-2 w-full rounded-xl border border-[#D9DEB8] px-3 py-2">{description}</textarea
+    >
+  </label>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <label class="block text-sm font-medium text-[#1F1F1A]">
+      Capacity
+      <input
+        name="capacity"
+        required
+        min="1"
+        type="number"
+        value={capacity}
+        class="mt-2 w-full rounded-xl border border-[#D9DEB8] px-3 py-2"
+      />
+    </label>
+    <label class="block text-sm font-medium text-[#1F1F1A]">
+      Starts at
+      <input
+        name="startsAt"
+        required
+        type="datetime-local"
+        value={localStartsAt}
+        class="mt-2 w-full rounded-xl border border-[#D9DEB8] px-3 py-2"
+      />
+    </label>
+  </div>
+  <button type="submit" class="rounded-xl bg-[#4F5A37] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3E4A2A]"
+    >{submitLabel}</button
+  >
+</form>

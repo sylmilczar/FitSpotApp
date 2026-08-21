@@ -37,6 +37,7 @@ export interface UpcomingReservationItem {
   className: string;
   classDescription: string | null;
   startsAt: string;
+  classStatus: ClassStatus;
   capacity: number;
   confirmedReservationsCount: number;
   availableSpots: number;

@@ -1,6 +1,8 @@
 ---
 const variant = Astro.props.variant === "light" ? "light" : "dark";
 const { user } = Astro.locals;
+const { role } = Astro.locals;
+const isPrivileged = role === "manager" || role === "admin";
 
 const containerClass =
   variant === "light"
@@ -30,6 +32,11 @@ const signUpHref = `/auth/signup?returnTo=${encodedReturnTo}`;
           <a href="/classes" class:list={[linkClass]}>
             Classes
           </a>
+          {isPrivileged ? (
+            <a href="/manager/classes" class:list={[linkClass]}>
+              Manage classes
+            </a>
+          ) : null}
           <form method="POST" action="/api/auth/signout">
             <button type="submit" class:list={[linkClass]}>
               Sign out
