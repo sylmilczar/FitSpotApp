@@ -5,11 +5,95 @@ import Layout from "@/layouts/Layout.astro";
 import { listManagerClasses } from "@/lib/classes.mutation.handler";
 import { createClient } from "@/lib/supabase";
 
+type ManagerViewMode = "list" | "calendar";
+type CalendarViewMode = "week" | "month";
+
+interface CalendarClassItem {
+  id: string;
+  name: string;
+  startsAt: string;
+  status: "scheduled" | "cancelled";
+  capacity: number;
+  confirmedReservationsCount: number;
+}
+
+function toStartOfDay(date: Date): Date {
+  const normalized = new Date(date);
+  normalized.setHours(0, 0, 0, 0);
+  return normalized;
+}
+
+function parseAnchorDate(value: string | null): Date {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return toStartOfDay(new Date());
+  }
+
+  const parsed = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) {
+    return toStartOfDay(new Date());
+  }
+
+  return parsed;
+}
+
+function formatAnchorDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function startOfWeekMonday(date: Date): Date {
+  const normalized = toStartOfDay(date);
+  const day = normalized.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  normalized.setDate(normalized.getDate() + diff);
+  return normalized;
+}
+
+function addDays(date: Date, days: number): Date {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function sameDay(left: Date, right: Date): boolean {
+  return (
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate()
+  );
+}
+
+function buildManagerClassesHref(params: {
+  view: ManagerViewMode;
+  calendarMode?: CalendarViewMode;
+  anchorDate?: Date;
+}): string {
+  const search = new URLSearchParams();
+  search.set("view", params.view);
+
+  if (params.view === "calendar") {
+    search.set("mode", params.calendarMode ?? "week");
+    search.set("date", formatAnchorDate(params.anchorDate ?? toStartOfDay(new Date())));
+  }
+
+  return `/manager/classes?${search.toString()}`;
+}
+
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 const result = supabase
   ? await listManagerClasses(supabase)
   : { ok: false as const, code: "CONFIG_ERROR", message: "Supabase is not configured." };
 const resultCode = Astro.url.searchParams.get("result");
+
+const viewParam = Astro.url.searchParams.get("view");
+const modeParam = Astro.url.searchParams.get("mode");
+const dateParam = Astro.url.searchParams.get("date");
+
+const managerView: ManagerViewMode = viewParam === "calendar" ? "calendar" : "list";
+const calendarMode: CalendarViewMode = modeParam === "month" ? "month" : "week";
+const calendarAnchorDate = parseAnchorDate(dateParam);
 
 const nowMs = Date.now();
 const currentClasses = result.ok
@@ -22,6 +106,108 @@ const archivedClasses = result.ok
       .filter((classItem) => new Date(classItem.startsAt).getTime() <= nowMs)
       .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime())
   : [];
+
+const allClassesForCalendar: CalendarClassItem[] = result.ok
+  ? result.data
+      .map((classItem) => ({
+        id: classItem.id,
+        name: classItem.name,
+        startsAt: classItem.startsAt,
+        status: classItem.status,
+        capacity: classItem.capacity,
+        confirmedReservationsCount: classItem.confirmedReservationsCount,
+      }))
+      .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
+  : [];
+
+const calendarPeriodStart =
+  calendarMode === "week"
+    ? startOfWeekMonday(calendarAnchorDate)
+    : new Date(calendarAnchorDate.getFullYear(), calendarAnchorDate.getMonth(), 1);
+const calendarPeriodEnd =
+  calendarMode === "week"
+    ? addDays(calendarPeriodStart, 7)
+    : new Date(calendarAnchorDate.getFullYear(), calendarAnchorDate.getMonth() + 1, 1);
+
+const previousAnchor =
+  calendarMode === "week"
+    ? addDays(calendarAnchorDate, -7)
+    : new Date(calendarAnchorDate.getFullYear(), calendarAnchorDate.getMonth() - 1, 1);
+const nextAnchor =
+  calendarMode === "week"
+    ? addDays(calendarAnchorDate, 7)
+    : new Date(calendarAnchorDate.getFullYear(), calendarAnchorDate.getMonth() + 1, 1);
+
+const calendarPeriodLabel =
+  calendarMode === "week"
+    ? `${new Intl.DateTimeFormat("en-US", {
+        day: "numeric",
+        month: "short",
+      }).format(calendarPeriodStart)} - ${new Intl.DateTimeFormat("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }).format(addDays(calendarPeriodEnd, -1))}`
+    : new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        year: "numeric",
+      }).format(calendarPeriodStart);
+
+const weekDays = Array.from({ length: 7 }, (_, index) => {
+  const date = addDays(startOfWeekMonday(calendarAnchorDate), index);
+  const classes = allClassesForCalendar.filter((classItem) => sameDay(new Date(classItem.startsAt), date));
+
+  return {
+    key: formatAnchorDate(date),
+    date,
+    classes,
+  };
+});
+
+const monthGridStart = startOfWeekMonday(new Date(calendarPeriodStart));
+const monthGridEnd = addDays(startOfWeekMonday(calendarPeriodEnd), 7);
+const monthDays: Array<{ key: string; date: Date; isCurrentMonth: boolean; classes: CalendarClassItem[] }> = [];
+
+for (let cursor = new Date(monthGridStart); cursor.getTime() < monthGridEnd.getTime(); cursor = addDays(cursor, 1)) {
+  monthDays.push({
+    key: formatAnchorDate(cursor),
+    date: new Date(cursor),
+    isCurrentMonth: cursor.getMonth() === calendarPeriodStart.getMonth(),
+    classes: allClassesForCalendar.filter((classItem) => sameDay(new Date(classItem.startsAt), cursor)),
+  });
+}
+
+const listViewHref = buildManagerClassesHref({ view: "list" });
+const calendarViewHref = buildManagerClassesHref({
+  view: "calendar",
+  calendarMode,
+  anchorDate: calendarAnchorDate,
+});
+const weekModeHref = buildManagerClassesHref({
+  view: "calendar",
+  calendarMode: "week",
+  anchorDate: calendarAnchorDate,
+});
+const monthModeHref = buildManagerClassesHref({
+  view: "calendar",
+  calendarMode: "month",
+  anchorDate: calendarAnchorDate,
+});
+const previousPeriodHref = buildManagerClassesHref({
+  view: "calendar",
+  calendarMode,
+  anchorDate: previousAnchor,
+});
+const nextPeriodHref = buildManagerClassesHref({
+  view: "calendar",
+  calendarMode,
+  anchorDate: nextAnchor,
+});
+const todayPeriodHref = buildManagerClassesHref({
+  view: "calendar",
+  calendarMode,
+  anchorDate: toStartOfDay(new Date()),
+});
 
 const resultFeedbackByCode: Record<string, { message: string; tone: "success" | "error" }> = {
   CREATED: { message: "Class created successfully.", tone: "success" },
@@ -88,6 +274,30 @@ const resultFeedback = resultCode
           >New class</a
         >
       </div>
+
+      <div class="mb-6 flex flex-wrap items-center gap-2">
+        <a
+          href={listViewHref}
+          class:list={[
+            "rounded-xl border px-3 py-2 text-sm font-semibold",
+            managerView === "list" ? "border-[#4F5A37] bg-[#EDF3DF] text-[#3E4A2A]" : "border-[#D9DEB8] text-[#4F5A37]",
+          ]}
+        >
+          List
+        </a>
+        <a
+          href={calendarViewHref}
+          class:list={[
+            "rounded-xl border px-3 py-2 text-sm font-semibold",
+            managerView === "calendar"
+              ? "border-[#4F5A37] bg-[#EDF3DF] text-[#3E4A2A]"
+              : "border-[#D9DEB8] text-[#4F5A37]",
+          ]}
+        >
+          Calendar
+        </a>
+      </div>
+
       {
         resultFeedback ? (
           <p
@@ -104,17 +314,155 @@ const resultFeedback = resultCode
       }
       {
         result.ok ? (
-          <div class="space-y-8">
-            <section>
-              <h2 class="mb-3 text-xl font-semibold text-[#1F1F1A]">Current classes</h2>
-              <ClassList classes={currentClasses} />
-            </section>
+          managerView === "list" ? (
+            <div class="space-y-8">
+              <section>
+                <h2 class="mb-3 text-xl font-semibold text-[#1F1F1A]">Current classes</h2>
+                <ClassList classes={currentClasses} />
+              </section>
 
-            <section>
-              <h2 class="mb-3 text-xl font-semibold text-[#1F1F1A]">Archived classes</h2>
-              <ClassList classes={archivedClasses} />
+              <section>
+                <h2 class="mb-3 text-xl font-semibold text-[#1F1F1A]">Archived classes</h2>
+                <ClassList classes={archivedClasses} />
+              </section>
+            </div>
+          ) : (
+            <section class="rounded-2xl border border-[#E6E6DD] bg-white p-4 shadow-[0_10px_24px_rgba(79,90,55,0.08)] sm:p-6">
+              <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap gap-2">
+                  <a
+                    href={weekModeHref}
+                    class:list={[
+                      "rounded-lg border px-3 py-1.5 text-sm font-semibold",
+                      calendarMode === "week"
+                        ? "border-[#4F5A37] bg-[#EDF3DF] text-[#3E4A2A]"
+                        : "border-[#D9DEB8] text-[#4F5A37]",
+                    ]}
+                  >
+                    Weekly
+                  </a>
+                  <a
+                    href={monthModeHref}
+                    class:list={[
+                      "rounded-lg border px-3 py-1.5 text-sm font-semibold",
+                      calendarMode === "month"
+                        ? "border-[#4F5A37] bg-[#EDF3DF] text-[#3E4A2A]"
+                        : "border-[#D9DEB8] text-[#4F5A37]",
+                    ]}
+                  >
+                    Monthly
+                  </a>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 text-sm">
+                  <a href={previousPeriodHref} class="rounded-lg border border-[#D9DEB8] px-3 py-1.5 text-[#4F5A37]">
+                    Prev
+                  </a>
+                  <a href={todayPeriodHref} class="rounded-lg border border-[#D9DEB8] px-3 py-1.5 text-[#4F5A37]">
+                    Today
+                  </a>
+                  <a href={nextPeriodHref} class="rounded-lg border border-[#D9DEB8] px-3 py-1.5 text-[#4F5A37]">
+                    Next
+                  </a>
+                </div>
+              </div>
+
+              <div class="mb-4 text-sm font-semibold text-[#1F1F1A]">{calendarPeriodLabel}</div>
+
+              {calendarMode === "week" ? (
+                <div class="grid gap-3 md:grid-cols-7">
+                  {weekDays.map((day) => (
+                    <article class="rounded-xl border border-[#E6E6DD] bg-[#F8F8F5] p-3">
+                      <h3 class="text-sm font-semibold text-[#1F1F1A]">
+                        {new Intl.DateTimeFormat("en-US", {
+                          weekday: "short",
+                          day: "numeric",
+                          month: "short",
+                        }).format(day.date)}
+                      </h3>
+
+                      <div class="mt-2 space-y-2">
+                        {day.classes.length > 0 ? (
+                          day.classes.map((classItem) => (
+                            <a
+                              href={`/manager/classes/${classItem.id}/edit`}
+                              class="block rounded-lg border border-[#D9DEB8] bg-white p-2 text-xs hover:bg-[#EDF3DF]"
+                            >
+                              <p class="font-semibold text-[#1F1F1A]">{classItem.name}</p>
+                              <p class="mt-1 text-[#67675F]">
+                                {new Intl.DateTimeFormat("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }).format(new Date(classItem.startsAt))}
+                              </p>
+                              <p class="mt-1 text-[#67675F]">
+                                {classItem.confirmedReservationsCount}/{classItem.capacity} confirmed
+                              </p>
+                              <p
+                                class:list={[
+                                  "mt-1 font-semibold uppercase",
+                                  classItem.status === "cancelled" ? "text-[#8E4040]" : "text-[#3E4A2A]",
+                                ]}
+                              >
+                                {classItem.status}
+                              </p>
+                            </a>
+                          ))
+                        ) : (
+                          <p class="text-xs text-[#9A9A92]">No classes</p>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div class="grid gap-3 md:grid-cols-7">
+                  {monthDays.map((day) => (
+                    <article
+                      class:list={[
+                        "min-h-28 rounded-xl border p-3",
+                        day.isCurrentMonth ? "border-[#E6E6DD] bg-[#F8F8F5]" : "border-[#EFEFE8] bg-[#FCFCFA]",
+                      ]}
+                    >
+                      <h3
+                        class:list={["text-sm font-semibold", day.isCurrentMonth ? "text-[#1F1F1A]" : "text-[#9A9A92]"]}
+                      >
+                        {new Intl.DateTimeFormat("en-US", {
+                          weekday: "short",
+                          day: "numeric",
+                        }).format(day.date)}
+                      </h3>
+
+                      <div class="mt-2 space-y-2">
+                        {day.classes.length > 0 ? (
+                          day.classes.slice(0, 3).map((classItem) => (
+                            <a
+                              href={`/manager/classes/${classItem.id}/edit`}
+                              class="block rounded-lg border border-[#D9DEB8] bg-white px-2 py-1.5 text-xs hover:bg-[#EDF3DF]"
+                            >
+                              <p class="font-semibold text-[#1F1F1A]">{classItem.name}</p>
+                              <p class="text-[#67675F]">
+                                {new Intl.DateTimeFormat("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }).format(new Date(classItem.startsAt))}
+                              </p>
+                            </a>
+                          ))
+                        ) : (
+                          <p class="text-xs text-[#9A9A92]">No classes</p>
+                        )}
+
+                        {day.classes.length > 3 ? (
+                          <p class="text-xs font-semibold text-[#4F5A37]">+{day.classes.length - 3} more</p>
+                        ) : null}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
             </section>
-          </div>
+          )
         ) : (
           <p class="rounded-xl border border-[#C95B5B]/30 bg-white p-5 text-[#8E4040]">{result.message}</p>
         )
