@@ -43,13 +43,23 @@ const { classes } = Astro.props;
             Attendees
           </a>
           {classItem.reservationCount === 0 ? (
-            <form method="post" action={`/api/classes/${classItem.id}/delete`}>
+            <form
+              method="post"
+              action={`/api/classes/${classItem.id}/delete`}
+              data-confirm-action="delete"
+              data-class-name={classItem.name}
+            >
               <button type="submit" class="text-[#8E4040] underline">
                 Delete
               </button>
             </form>
           ) : classItem.status !== "cancelled" ? (
-            <form method="post" action={`/api/classes/${classItem.id}/cancel`}>
+            <form
+              method="post"
+              action={`/api/classes/${classItem.id}/cancel`}
+              data-confirm-action="cancel"
+              data-class-name={classItem.name}
+            >
               <button type="submit" class="text-[#8E4040] underline">
                 Cancel class
               </button>
@@ -60,3 +70,122 @@ const { classes } = Astro.props;
     ))
   }
 </div>
+
+<div
+  data-class-action-modal
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-[#1F1F1A]/55 px-4"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="class-action-modal-title"
+>
+  <div
+    class="w-full max-w-md rounded-2xl border border-[#E6E6DD] bg-white p-6 shadow-[0_18px_40px_rgba(31,31,26,0.28)]"
+  >
+    <h3 id="class-action-modal-title" class="text-lg font-semibold text-[#1F1F1A]">Confirm action</h3>
+    <p data-class-action-modal-message class="mt-3 text-sm leading-6 text-[#67675F]"></p>
+    <p class="mt-2 text-xs font-semibold tracking-wide text-[#8E4040] uppercase">This action is irreversible.</p>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        data-class-action-cancel
+        class="rounded-xl border border-[#D9DEB8] px-4 py-2 text-sm font-semibold text-[#4F5A37]"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        data-class-action-confirm
+        class="rounded-xl bg-[#8E4040] px-4 py-2 text-sm font-semibold text-white hover:bg-[#7A3636]"
+      >
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  const actionLabels = {
+    cancel: "cancel",
+    delete: "delete",
+  };
+
+  const confirmForms = document.querySelectorAll("form[data-confirm-action][data-class-name]");
+  const modal = document.querySelector("[data-class-action-modal]");
+  const messageNode = document.querySelector("[data-class-action-modal-message]");
+  const cancelButton = document.querySelector("[data-class-action-cancel]");
+  const confirmButton = document.querySelector("[data-class-action-confirm]");
+
+  let pendingForm = null;
+
+  function closeModal() {
+    if (!(modal instanceof HTMLDivElement)) {
+      return;
+    }
+
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+    pendingForm = null;
+  }
+
+  function openModal(action, className, form) {
+    if (!(modal instanceof HTMLDivElement) || !(messageNode instanceof HTMLElement)) {
+      return;
+    }
+
+    const actionLabel = actionLabels[action] || "continue";
+    messageNode.textContent = `Are you sure you want to ${actionLabel} class: "${className}"?`;
+    pendingForm = form;
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+
+  confirmForms.forEach((form) => {
+    form.addEventListener("submit", (event) => {
+      if (!(form instanceof HTMLFormElement)) {
+        return;
+      }
+
+      if (form.dataset.confirmed === "true") {
+        delete form.dataset.confirmed;
+        return;
+      }
+
+      event.preventDefault();
+      openModal(form.dataset.confirmAction || "", form.dataset.className || "", form);
+    });
+  });
+
+  if (cancelButton instanceof HTMLButtonElement) {
+    cancelButton.addEventListener("click", () => {
+      closeModal();
+    });
+  }
+
+  if (confirmButton instanceof HTMLButtonElement) {
+    confirmButton.addEventListener("click", () => {
+      if (!(pendingForm instanceof HTMLFormElement)) {
+        closeModal();
+        return;
+      }
+
+      pendingForm.dataset.confirmed = "true";
+      pendingForm.requestSubmit();
+      closeModal();
+    });
+  }
+
+  if (modal instanceof HTMLDivElement) {
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeModal();
+    }
+  });
+</script>
