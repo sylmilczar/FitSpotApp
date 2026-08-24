@@ -10,7 +10,37 @@ const result = supabase
   ? await listManagerClasses(supabase)
   : { ok: false as const, code: "CONFIG_ERROR", message: "Supabase is not configured." };
 const resultCode = Astro.url.searchParams.get("result");
-const resultMessage = resultCode ? `Operation result: ${resultCode}` : null;
+
+const resultFeedbackByCode: Record<string, { message: string; tone: "success" | "error" }> = {
+  CREATED: { message: "Class created successfully.", tone: "success" },
+  UPDATED: { message: "Class updated successfully.", tone: "success" },
+  DELETED: { message: "Class deleted successfully.", tone: "success" },
+  CANCELLED: { message: "Class cancelled successfully.", tone: "success" },
+  CONFIG_ERROR: { message: "Configuration issue. Please contact support.", tone: "error" },
+  DATABASE_ERROR: { message: "Database error. Please try again in a moment.", tone: "error" },
+  VALIDATION_ERROR: { message: "Some class data is invalid. Please review the form.", tone: "error" },
+  INVALID_FORMAT: { message: "Enter a valid class date and time.", tone: "error" },
+  PAST_DATE: { message: "Class must start in the future.", tone: "error" },
+  CAPACITY_BELOW_RESERVATIONS: {
+    message: "Capacity cannot be lower than confirmed reservations.",
+    tone: "error",
+  },
+  STARTS_AT_LOCKED: {
+    message: "Start date and time cannot be changed while the class has confirmed reservations.",
+    tone: "error",
+  },
+  HAS_RESERVATIONS: {
+    message: "This class has reservations, so it cannot be deleted. Cancel it instead.",
+    tone: "error",
+  },
+};
+
+const resultFeedback = resultCode
+  ? (resultFeedbackByCode[resultCode] ?? {
+      message: "Operation could not be completed. Please try again.",
+      tone: "error" as const,
+    })
+  : null;
 ---
 
 <Layout title="Manage classes">
@@ -30,9 +60,16 @@ const resultMessage = resultCode ? `Operation result: ${resultCode}` : null;
         >
       </div>
       {
-        resultMessage ? (
-          <p class="mb-5 rounded-xl border border-[#D9DEB8] bg-[#EDF3DF] px-4 py-3 text-sm text-[#3E4A2A]">
-            {resultMessage}
+        resultFeedback ? (
+          <p
+            class:list={[
+              "mb-5 rounded-xl border px-4 py-3 text-sm",
+              resultFeedback.tone === "success"
+                ? "border-[#D9DEB8] bg-[#EDF3DF] text-[#3E4A2A]"
+                : "border-[#C95B5B]/30 bg-[#FFF0F0] text-[#8E4040]",
+            ]}
+          >
+            {resultFeedback.message}
           </p>
         ) : null
       }
