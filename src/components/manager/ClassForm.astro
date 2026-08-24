@@ -18,7 +18,31 @@ const {
   startsAt = "",
   error = null,
 } = Astro.props;
-const localStartsAt = startsAt ? new Date(startsAt).toISOString().slice(0, 16) : "";
+
+function toDateTimeLocalValue(value: string): string {
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return "";
+  }
+
+  const date = new Date(trimmedValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  const pad = (num: number) => String(num).padStart(2, "0");
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+const localStartsAt = toDateTimeLocalValue(startsAt);
 ---
 
 <form
