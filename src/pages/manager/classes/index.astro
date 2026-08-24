@@ -11,6 +11,18 @@ const result = supabase
   : { ok: false as const, code: "CONFIG_ERROR", message: "Supabase is not configured." };
 const resultCode = Astro.url.searchParams.get("result");
 
+const nowMs = Date.now();
+const currentClasses = result.ok
+  ? result.data
+      .filter((classItem) => new Date(classItem.startsAt).getTime() > nowMs)
+      .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
+  : [];
+const archivedClasses = result.ok
+  ? result.data
+      .filter((classItem) => new Date(classItem.startsAt).getTime() <= nowMs)
+      .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime())
+  : [];
+
 const resultFeedbackByCode: Record<string, { message: string; tone: "success" | "error" }> = {
   CREATED: { message: "Class created successfully.", tone: "success" },
   UPDATED: { message: "Class updated successfully.", tone: "success" },
@@ -75,7 +87,17 @@ const resultFeedback = resultCode
       }
       {
         result.ok ? (
-          <ClassList classes={result.data} />
+          <div class="space-y-8">
+            <section>
+              <h2 class="mb-3 text-xl font-semibold text-[#1F1F1A]">Current classes</h2>
+              <ClassList classes={currentClasses} />
+            </section>
+
+            <section>
+              <h2 class="mb-3 text-xl font-semibold text-[#1F1F1A]">Archived classes</h2>
+              <ClassList classes={archivedClasses} />
+            </section>
+          </div>
         ) : (
           <p class="rounded-xl border border-[#C95B5B]/30 bg-white p-5 text-[#8E4040]">{result.message}</p>
         )
