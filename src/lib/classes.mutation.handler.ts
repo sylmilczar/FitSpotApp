@@ -45,6 +45,10 @@ interface ClassRow {
   status: ClassStatus;
 }
 
+interface ClassStartsAtRow {
+  starts_at: string;
+}
+
 interface ReservationCountRow {
   class_id: string;
   status: "confirmed" | "cancelled";
@@ -198,6 +202,26 @@ export async function updateClass(
 
   if (normalized.data.capacity < confirmedCount) {
     return failure("CAPACITY_BELOW_RESERVATIONS", "Capacity cannot be lower than confirmed reservations.");
+  }
+
+  const { data: classRow, error: classError } = await supabase
+    .from("classes")
+    .select("starts_at")
+    .eq("id", classId)
+    .single<ClassStartsAtRow>();
+
+  if (classError) {
+    return databaseFailure(classError, "Could not load class details.");
+  }
+
+  const previousStartsAtMs = new Date(classRow.starts_at).getTime();
+  const nextStartsAtMs = new Date(normalized.data.starts_at).getTime();
+
+  if (confirmedCount > 0 && previousStartsAtMs !== nextStartsAtMs) {
+    return failure(
+      "STARTS_AT_LOCKED",
+      "Start date and time cannot be changed while the class has confirmed reservations.",
+    );
   }
 
   const { error } = await supabase.from("classes").update(normalized.data).eq("id", classId);

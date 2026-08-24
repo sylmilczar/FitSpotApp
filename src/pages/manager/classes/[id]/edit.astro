@@ -26,6 +26,8 @@ const classItem = result.ok ? result.data.find((item) => item.id === classId) : 
             description={classItem.description}
             capacity={classItem.capacity}
             startsAt={classItem.startsAt}
+            minCapacity={Math.max(1, classItem.confirmedReservationsCount)}
+            lockStartsAt={classItem.confirmedReservationsCount > 0}
           />
         ) : (
           <p class="rounded-xl bg-white p-5 text-[#8E4040]">Class not found.</p>

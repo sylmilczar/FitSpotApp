@@ -39,19 +39,18 @@ if (currentUser) {
 
 const hours = Array.from({ length: 14 }, (_, idx) => idx + 8);
 const dayStart = new Date();
-dayStart.setUTCHours(0, 0, 0, 0);
+dayStart.setHours(0, 0, 0, 0);
 
 const days = Array.from({ length: 7 }, (_, idx) => {
   const date = new Date(dayStart);
-  date.setUTCDate(dayStart.getUTCDate() + idx);
+  date.setDate(dayStart.getDate() + idx);
   return {
     date,
-    key: `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`,
+    key: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`,
     label: new Intl.DateTimeFormat("en-US", {
       weekday: "short",
       day: "numeric",
       month: "short",
-      timeZone: "UTC",
     }).format(date),
   };
 });
@@ -61,10 +60,10 @@ function getClassCellItems(classes: ClassListItem[], day: Date, hour: number) {
     const startsAt = new Date(classItem.startsAt);
 
     return (
-      startsAt.getUTCFullYear() === day.getUTCFullYear() &&
-      startsAt.getUTCMonth() === day.getUTCMonth() &&
-      startsAt.getUTCDate() === day.getUTCDate() &&
-      startsAt.getUTCHours() === hour
+      startsAt.getFullYear() === day.getFullYear() &&
+      startsAt.getMonth() === day.getMonth() &&
+      startsAt.getDate() === day.getDate() &&
+      startsAt.getHours() === hour
     );
   });
 }
@@ -77,7 +76,6 @@ function formatClassTime(startsAtIso: string) {
   return new Intl.DateTimeFormat("en-US", {
     hour: "2-digit",
     minute: "2-digit",
-    timeZone: "UTC",
   }).format(new Date(startsAtIso));
 }
 ---

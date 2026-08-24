@@ -6,6 +6,8 @@ interface Props {
   description?: string | null;
   capacity?: number;
   startsAt?: string;
+  minCapacity?: number;
+  lockStartsAt?: boolean;
   error?: string | null;
 }
 
@@ -16,6 +18,8 @@ const {
   description = "",
   capacity = 10,
   startsAt = "",
+  minCapacity = 1,
+  lockStartsAt = false,
   error = null,
 } = Astro.props;
 
@@ -80,11 +84,16 @@ const localStartsAt = toDateTimeLocalValue(startsAt);
       <input
         name="capacity"
         required
-        min="1"
+        min={minCapacity}
         type="number"
         value={capacity}
         class="mt-2 w-full rounded-xl border border-[#D9DEB8] px-3 py-2"
       />
+      {
+        minCapacity > 1 ? (
+          <p class="mt-1 text-xs text-[#67675F]">Capacity cannot be lower than {minCapacity} active reservations.</p>
+        ) : null
+      }
     </label>
     <label class="block text-sm font-medium text-[#1F1F1A]">
       Starts at
@@ -93,8 +102,20 @@ const localStartsAt = toDateTimeLocalValue(startsAt);
         required
         type="datetime-local"
         value={localStartsAt}
-        class="mt-2 w-full rounded-xl border border-[#D9DEB8] px-3 py-2"
+        readonly={lockStartsAt}
+        aria-readonly={lockStartsAt}
+        class:list={[
+          "mt-2 w-full rounded-xl border border-[#D9DEB8] px-3 py-2",
+          lockStartsAt ? "bg-[#F8F8F5] text-[#67675F]" : "",
+        ]}
       />
+      {
+        lockStartsAt ? (
+          <p class="mt-1 text-xs text-[#67675F]">
+            Start date and time cannot be changed while the class has active reservations.
+          </p>
+        ) : null
+      }
     </label>
   </div>
   <button type="submit" class="rounded-xl bg-[#4F5A37] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3E4A2A]"
