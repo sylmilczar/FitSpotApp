@@ -2,7 +2,7 @@
 import ClassList from "@/components/manager/ClassList.astro";
 import Topbar from "@/components/Topbar.astro";
 import Layout from "@/layouts/Layout.astro";
-import { listManagerClasses } from "@/lib/classes.mutation.handler";
+import { type ManagerClassItem, listManagerClasses } from "@/lib/classes.mutation.handler";
 import { createClient } from "@/lib/supabase";
 
 type ManagerViewMode = "list" | "calendar";
@@ -96,16 +96,93 @@ const calendarMode: CalendarViewMode = modeParam === "month" ? "month" : "week";
 const calendarAnchorDate = parseAnchorDate(dateParam);
 
 const nowMs = Date.now();
-const currentClasses = result.ok
-  ? result.data
-      .filter((classItem) => new Date(classItem.startsAt).getTime() > nowMs)
-      .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
-  : [];
-const archivedClasses = result.ok
-  ? result.data
-      .filter((classItem) => new Date(classItem.startsAt).getTime() <= nowMs)
-      .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime())
-  : [];
+const managerListItems = result.ok ? result.data : [];
+
+const singleItems = managerListItems.filter((classItem) => !classItem.seriesId);
+const seriesGroups = new Map<string, ManagerClassItem[]>();
+
+for (const classItem of managerListItems) {
+  if (!classItem.seriesId) {
+    continue;
+  }
+
+  const group = seriesGroups.get(classItem.seriesId) ?? [];
+  group.push(classItem);
+  seriesGroups.set(classItem.seriesId, group);
+}
+
+const seriesSummaryItems: ManagerClassItem[] = Array.from(seriesGroups.values()).map((groupItems) => {
+  const sortedItems = [...groupItems].sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
+  const firstItem = sortedItems[0];
+  const lastItem = sortedItems[sortedItems.length - 1];
+
+  const representativeItem =
+    sortedItems.find((item) => new Date(item.startsAt).getTime() >= nowMs && item.status === "scheduled") ??
+    sortedItems.find((item) => new Date(item.startsAt).getTime() >= nowMs) ??
+    lastItem;
+
+  const hasFutureOccurrences = sortedItems.some(
+    (item) => new Date(item.startsAt).getTime() > nowMs && item.status === "scheduled",
+  );
+
+  const nextScheduledClass = sortedItems.find(
+    (item) => new Date(item.startsAt).getTime() > nowMs && item.status === "scheduled",
+  );
+
+  const totalConfirmedReservations = sortedItems.reduce((sum, item) => sum + item.confirmedReservationsCount, 0);
+
+  const firstDate = new Date(firstItem.startsAt);
+  const lastDate = new Date(lastItem.startsAt);
+
+  const rangeLabel = `${new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(firstDate)} - ${new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(lastDate)}`;
+
+  return {
+    id: representativeItem.id,
+    seriesId: representativeItem.seriesId,
+    name: representativeItem.name,
+    description: representativeItem.description,
+    capacity: representativeItem.capacity,
+    startsAt: representativeItem.startsAt,
+    status: hasFutureOccurrences ? "scheduled" : "cancelled",
+    confirmedReservationsCount: totalConfirmedReservations,
+    reservationCount: sortedItems.reduce((sum, item) => sum + item.reservationCount, 0),
+    isSeriesSummary: true,
+    seriesWeekdayLabel: new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(firstDate),
+    seriesTimeLabel: new Intl.DateTimeFormat("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(firstDate),
+    seriesRangeLabel: rangeLabel,
+    seriesOccurrencesCount: sortedItems.length,
+    hasFutureOccurrences,
+    seriesNextClassLabel: nextScheduledClass
+      ? new Intl.DateTimeFormat("pl-PL", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }).format(new Date(nextScheduledClass.startsAt))
+      : undefined,
+    seriesNextConfirmedLabel: nextScheduledClass
+      ? `${nextScheduledClass.confirmedReservationsCount}/${nextScheduledClass.capacity} confirmed`
+      : undefined,
+  };
+});
+
+const allListCards = [...singleItems, ...seriesSummaryItems];
+const currentClasses = allListCards
+  .filter((classItem) => new Date(classItem.startsAt).getTime() > nowMs)
+  .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
+const archivedClasses = allListCards
+  .filter((classItem) => new Date(classItem.startsAt).getTime() <= nowMs)
+  .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime());
 
 const allClassesForCalendar: CalendarClassItem[] = result.ok
   ? result.data
@@ -234,6 +311,14 @@ const resultFeedbackByCode: Record<string, { message: string; tone: "success" | 
   NOT_RECURRING: { message: "This class is not part of a recurring series.", tone: "error" },
   SERIES_START_CHANGE_UNSUPPORTED: {
     message: "Changing start date/time for all following recurring classes is not supported yet.",
+    tone: "error",
+  },
+  SERIES_STOP_DATE_INVALID: {
+    message: "Enter a valid date to stop this recurring series.",
+    tone: "error",
+  },
+  SERIES_STOP_DATE_OUT_OF_RANGE: {
+    message: "No recurring classes exist on or after the selected date.",
     tone: "error",
   },
   CAPACITY_BELOW_RESERVATIONS: {

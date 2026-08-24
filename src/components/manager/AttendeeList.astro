@@ -1,40 +1,97 @@
 ---
 import type { ClassAttendeeItem } from "@/types";
 
-interface Props {
+interface AttendeeDateGroup {
+  label: string;
+  startsAt: string;
   attendees: ClassAttendeeItem[];
 }
-const { attendees } = Astro.props;
+
+interface Props {
+  currentGroups: AttendeeDateGroup[];
+  archivedGroups: AttendeeDateGroup[];
+}
+const { currentGroups, archivedGroups } = Astro.props;
 ---
 
-<div class="overflow-x-auto rounded-2xl border border-[#E6E6DD] bg-white">
-  <table class="w-full text-left text-sm">
-    <thead class="border-b border-[#E6E6DD] bg-[#F8F8F5]">
-      <tr><th class="px-4 py-3">Email</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Reserved at</th></tr>
-    </thead>
-    <tbody>
-      {
-        attendees.length === 0 ? (
-          <tr>
-            <td colspan="3" class="px-4 py-5 text-[#67675F]">
-              No reservation records.
-            </td>
-          </tr>
-        ) : null
-      }
-      {
-        attendees.map((attendee) => (
-          <tr class="border-b border-[#E6E6DD] last:border-0">
-            <td class="px-4 py-3">{attendee.userEmail}</td>
-            <td class="px-4 py-3">
-              <span class:list={[attendee.status === "cancelled" ? "text-[#8E4040]" : "text-[#3E4A2A]"]}>
-                {attendee.status}
-              </span>
-            </td>
-            <td class="px-4 py-3 text-[#67675F]">{new Date(attendee.createdAt).toLocaleString()}</td>
-          </tr>
-        ))
-      }
-    </tbody>
-  </table>
+<div class="space-y-6">
+  {
+    currentGroups.length === 0 && archivedGroups.length === 0 ? (
+      <p class="rounded-2xl border border-[#E6E6DD] bg-white p-5 text-sm text-[#67675F]">No reservation records.</p>
+    ) : null
+  }
+
+  {
+    currentGroups.length > 0 ? (
+      <section class="space-y-4">
+        <h2 class="text-xl font-semibold text-[#1F1F1A]">Current classes</h2>
+        {currentGroups.map((group) => (
+          <article class="overflow-x-auto rounded-2xl border border-[#E6E6DD] bg-white">
+            <header class="border-b border-[#E6E6DD] bg-[#F8F8F5] px-4 py-3">
+              <h3 class="text-sm font-semibold text-[#1F1F1A]">{group.label}</h3>
+            </header>
+            <table class="w-full text-left text-sm">
+              <thead class="border-b border-[#E6E6DD] bg-[#FCFCFA]">
+                <tr>
+                  <th class="px-4 py-3">Email</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Reserved at</th>
+                </tr>
+              </thead>
+              <tbody>
+                {group.attendees.map((attendee) => (
+                  <tr class="border-b border-[#E6E6DD] last:border-0">
+                    <td class="px-4 py-3">{attendee.userEmail}</td>
+                    <td class="px-4 py-3">
+                      <span class:list={[attendee.status === "cancelled" ? "text-[#8E4040]" : "text-[#3E4A2A]"]}>
+                        {attendee.status}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 text-[#67675F]">{new Date(attendee.createdAt).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </article>
+        ))}
+      </section>
+    ) : null
+  }
+
+  {
+    archivedGroups.length > 0 ? (
+      <section class="space-y-4">
+        <h2 class="text-xl font-semibold text-[#1F1F1A]">Archived classes</h2>
+        {archivedGroups.map((group) => (
+          <article class="overflow-x-auto rounded-2xl border border-[#E6E6DD] bg-white">
+            <header class="border-b border-[#E6E6DD] bg-[#F8F8F5] px-4 py-3">
+              <h3 class="text-sm font-semibold text-[#1F1F1A]">{group.label}</h3>
+            </header>
+            <table class="w-full text-left text-sm">
+              <thead class="border-b border-[#E6E6DD] bg-[#FCFCFA]">
+                <tr>
+                  <th class="px-4 py-3">Email</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Reserved at</th>
+                </tr>
+              </thead>
+              <tbody>
+                {group.attendees.map((attendee) => (
+                  <tr class="border-b border-[#E6E6DD] last:border-0">
+                    <td class="px-4 py-3">{attendee.userEmail}</td>
+                    <td class="px-4 py-3">
+                      <span class:list={[attendee.status === "cancelled" ? "text-[#8E4040]" : "text-[#3E4A2A]"]}>
+                        {attendee.status}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 text-[#67675F]">{new Date(attendee.createdAt).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </article>
+        ))}
+      </section>
+    ) : null
+  }
 </div>

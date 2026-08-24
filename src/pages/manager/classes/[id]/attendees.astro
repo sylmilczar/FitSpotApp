@@ -2,8 +2,49 @@
 import AttendeeList from "@/components/manager/AttendeeList.astro";
 import Topbar from "@/components/Topbar.astro";
 import Layout from "@/layouts/Layout.astro";
+import type { ClassAttendeeItem } from "@/types";
 import { getClassAttendees, listManagerClasses } from "@/lib/classes.mutation.handler";
 import { createClient } from "@/lib/supabase";
+
+interface AttendeeDateGroup {
+  label: string;
+  startsAt: string;
+  attendees: ClassAttendeeItem[];
+}
+
+function buildGroupedSections(attendees: ClassAttendeeItem[]) {
+  const groupsByStartsAt = new Map<string, ClassAttendeeItem[]>();
+
+  for (const attendee of attendees) {
+    const current = groupsByStartsAt.get(attendee.classStartsAt) ?? [];
+    current.push(attendee);
+    groupsByStartsAt.set(attendee.classStartsAt, current);
+  }
+
+  const allGroups: AttendeeDateGroup[] = Array.from(groupsByStartsAt.entries()).map(([startsAt, groupAttendees]) => ({
+    startsAt,
+    attendees: groupAttendees.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()),
+    label: new Intl.DateTimeFormat("pl-PL", {
+      weekday: "long",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(startsAt)),
+  }));
+
+  const nowMs = Date.now();
+
+  return {
+    currentGroups: allGroups
+      .filter((group) => new Date(group.startsAt).getTime() >= nowMs)
+      .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()),
+    archivedGroups: allGroups
+      .filter((group) => new Date(group.startsAt).getTime() < nowMs)
+      .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime()),
+  };
+}
 
 const classId = Astro.params.id ?? "";
 const supabase = createClient(Astro.request.headers, Astro.cookies);
@@ -12,6 +53,10 @@ const classItem = classesResult?.ok ? classesResult.data.find((item) => item.id 
 const attendeesResult = supabase
   ? await getClassAttendees(supabase, classId)
   : { ok: false as const, code: "CONFIG_ERROR", message: "Supabase is not configured." };
+
+const groupedSections = attendeesResult.ok
+  ? buildGroupedSections(attendeesResult.data)
+  : { currentGroups: [], archivedGroups: [] };
 ---
 
 <Layout title="Class attendees">
@@ -21,10 +66,10 @@ const attendeesResult = supabase
       ><h1 class="mt-6 text-3xl font-bold text-[#1F1F1A]">{classItem?.name ?? "Class attendees"}</h1><p
         class="mt-2 mb-6 text-sm text-[#67675F]"
       >
-        Confirmed and cancelled reservation records.
+        Confirmed and cancelled reservation records grouped by class dates.
       </p>{
         attendeesResult.ok ? (
-          <AttendeeList attendees={attendeesResult.data} />
+          <AttendeeList currentGroups={groupedSections.currentGroups} archivedGroups={groupedSections.archivedGroups} />
         ) : (
           <p class="rounded-xl bg-white p-5 text-[#8E4040]">{attendeesResult.message}</p>
         )

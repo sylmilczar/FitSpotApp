@@ -19,18 +19,48 @@ const classItem = result.ok ? result.data.find((item) => item.id === classId) : 
       <Topbar variant="light" /><a href="/manager/classes" class="text-sm text-[#4F5A37] underline">Back to classes</a
       ><h1 class="my-6 text-3xl font-bold text-[#1F1F1A]">Edit class</h1>{
         classItem ? (
-          <ClassForm
-            action={`/api/classes/${classId}/update`}
-            submitLabel="Save changes"
-            className={classItem.name}
-            description={classItem.description}
-            capacity={classItem.capacity}
-            startsAt={classItem.startsAt}
-            minCapacity={Math.max(1, classItem.confirmedReservationsCount)}
-            lockStartsAt={classItem.confirmedReservationsCount > 0}
-            showSeriesUpdateControls={true}
-            hasSeries={Boolean(classItem.seriesId)}
-          />
+          <>
+            <ClassForm
+              action={`/api/classes/${classId}/update`}
+              submitLabel="Save changes"
+              className={classItem.name}
+              description={classItem.description}
+              capacity={classItem.capacity}
+              startsAt={classItem.startsAt}
+              minCapacity={Math.max(1, classItem.confirmedReservationsCount)}
+              lockStartsAt={classItem.confirmedReservationsCount > 0}
+              showSeriesUpdateControls={true}
+              hasSeries={Boolean(classItem.seriesId)}
+            />
+
+            {classItem.seriesId ? (
+              <form
+                method="post"
+                action={`/api/classes/${classId}/series/stop`}
+                class="mt-6 space-y-3 rounded-2xl border border-[#E6E6DD] bg-white p-6 shadow-[0_10px_24px_rgba(79,90,55,0.08)]"
+              >
+                <h2 class="text-lg font-semibold text-[#1F1F1A]">Disable recurring series</h2>
+                <p class="text-sm text-[#67675F]">
+                  Choose the date from which future classes in this series should be cancelled.
+                </p>
+                <label class="block text-sm font-medium text-[#1F1F1A]">
+                  Stop from date
+                  <input
+                    name="stopFromDate"
+                    required
+                    type="date"
+                    class="mt-2 w-full rounded-xl border border-[#D9DEB8] px-3 py-2"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  class="rounded-xl bg-[#8E4040] px-4 py-2 text-sm font-semibold text-white hover:bg-[#7A3636]"
+                >
+                  Stop series from selected date
+                </button>
+              </form>
+            ) : null}
+          </>
         ) : (
           <p class="rounded-xl bg-white p-5 text-[#8E4040]">Class not found.</p>
         )

@@ -53,6 +53,14 @@ export interface ManagerClassItem {
   status: ClassStatus;
   confirmedReservationsCount: number;
   reservationCount: number;
+  isSeriesSummary?: boolean;
+  seriesWeekdayLabel?: string;
+  seriesTimeLabel?: string;
+  seriesRangeLabel?: string;
+  seriesOccurrencesCount?: number;
+  hasFutureOccurrences?: boolean;
+  seriesNextClassLabel?: string;
+  seriesNextConfirmedLabel?: string;
 }
 
 interface ClassRow {
@@ -67,6 +75,11 @@ interface ClassRow {
 
 interface ClassStartsAtRow {
   class_series_id: string | null;
+  starts_at: string;
+}
+
+interface ClassSeriesMemberRow {
+  id: string;
   starts_at: string;
 }
 
@@ -521,6 +534,83 @@ export async function stopSeriesFromClass(supabase: SupabaseClient, classId: str
   return { ok: true };
 }
 
+export async function stopSeriesFromDate(
+  supabase: SupabaseClient,
+  classId: string,
+  stopFromDate: string,
+): Promise<ClassMutationResult> {
+  if (!uuidSchema.safeParse(classId).success) {
+    return failure("VALIDATION_ERROR", "Invalid class identifier.");
+  }
+
+  const trimmedStopFromDate = stopFromDate.trim();
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmedStopFromDate)) {
+    return failure("SERIES_STOP_DATE_INVALID", "Enter a valid date to stop this recurring series.");
+  }
+
+  const localStopFrom = new Date(`${trimmedStopFromDate}T00:00:00`);
+
+  if (Number.isNaN(localStopFrom.getTime())) {
+    return failure("SERIES_STOP_DATE_INVALID", "Enter a valid date to stop this recurring series.");
+  }
+
+  const { data: classRow, error: classError } = await supabase
+    .from("classes")
+    .select("starts_at, class_series_id")
+    .eq("id", classId)
+    .single<ClassStartsAtRow>();
+
+  if (classError) {
+    return databaseFailure(classError, "Could not load class details.");
+  }
+
+  if (!classRow.class_series_id) {
+    return failure("NOT_RECURRING", "This class is not part of a recurring series.");
+  }
+
+  const { data: firstTargetClass, error: firstTargetClassError } = await supabase
+    .from("classes")
+    .select("starts_at")
+    .eq("class_series_id", classRow.class_series_id)
+    .gte("starts_at", localStopFrom.toISOString())
+    .order("starts_at", { ascending: true })
+    .limit(1)
+    .single<{ starts_at: string }>();
+
+  if (firstTargetClassError) {
+    return failure("SERIES_STOP_DATE_OUT_OF_RANGE", "No recurring classes exist on or after the selected date.");
+  }
+
+  const effectiveStopFrom = firstTargetClass.starts_at;
+
+  const { error: seriesError } = await supabase
+    .from("class_series")
+    .update({
+      is_active: false,
+      disabled_from: effectiveStopFrom,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", classRow.class_series_id);
+
+  if (seriesError) {
+    return databaseFailure(seriesError, "Could not disable recurring series.");
+  }
+
+  const { error: cancelFutureError } = await supabase
+    .from("classes")
+    .update({ status: "cancelled" })
+    .eq("class_series_id", classRow.class_series_id)
+    .gte("starts_at", effectiveStopFrom)
+    .eq("status", "scheduled");
+
+  if (cancelFutureError) {
+    return databaseFailure(cancelFutureError, "Could not cancel future recurring classes.");
+  }
+
+  return { ok: true };
+}
+
 export async function listManagerClasses(
   supabase: SupabaseClient,
 ): Promise<{ ok: true; data: ManagerClassItem[] } | { ok: false; code: string; message: string }> {
@@ -580,25 +670,71 @@ export async function getClassAttendees(
     return { ok: false, code: "VALIDATION_ERROR", message: "Invalid class identifier." };
   }
 
-  const rpcResponse = attendeeRpcResponseSchema.parse(
-    await supabase.rpc("get_class_attendees", { p_class_id: classId }),
-  );
-  const { data, error } = rpcResponse;
+  const { data: selectedClass, error: selectedClassError } = await supabase
+    .from("classes")
+    .select("id, class_series_id, starts_at")
+    .eq("id", classId)
+    .single<ClassSeriesMemberRow & { class_series_id: string | null }>();
 
-  if (error) {
-    return { ok: false, code: "DATABASE_ERROR", message: error.message };
+  if (selectedClassError) {
+    return { ok: false, code: "DATABASE_ERROR", message: selectedClassError.message };
   }
 
-  const attendeeRows = attendeeRowSchema.array().parse(data);
+  let classMembers: ClassSeriesMemberRow[] = [
+    {
+      id: selectedClass.id,
+      starts_at: selectedClass.starts_at,
+    },
+  ];
+
+  if (selectedClass.class_series_id) {
+    const { data: seriesMembers, error: seriesMembersError } = await supabase
+      .from("classes")
+      .select("id, starts_at")
+      .eq("class_series_id", selectedClass.class_series_id)
+      .order("starts_at", { ascending: true });
+
+    if (seriesMembersError) {
+      return { ok: false, code: "DATABASE_ERROR", message: seriesMembersError.message };
+    }
+
+    classMembers = seriesMembers;
+  }
+
+  let attendeesPerClass: ClassAttendeeItem[][];
+
+  try {
+    attendeesPerClass = await Promise.all(
+      classMembers.map(async (member) => {
+        const rpcResponse = attendeeRpcResponseSchema.parse(
+          await supabase.rpc("get_class_attendees", { p_class_id: member.id }),
+        );
+        const { data, error } = rpcResponse;
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        const attendeeRows = attendeeRowSchema.array().parse(data);
+
+        return attendeeRows.map((row: AttendeeRow) => ({
+          reservationId: row.reservation_id,
+          classId: member.id,
+          classStartsAt: member.starts_at,
+          userId: row.user_id,
+          userEmail: row.user_email,
+          status: row.status,
+          createdAt: row.created_at,
+        }));
+      }),
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not load class attendees.";
+    return { ok: false, code: "DATABASE_ERROR", message };
+  }
 
   return {
     ok: true,
-    data: attendeeRows.map((row: AttendeeRow) => ({
-      reservationId: row.reservation_id,
-      userId: row.user_id,
-      userEmail: row.user_email,
-      status: row.status,
-      createdAt: row.created_at,
-    })),
+    data: attendeesPerClass.flat(),
   };
 }

@@ -20,11 +20,29 @@ const { classes } = Astro.props;
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 class="text-lg font-semibold text-[#1F1F1A]">{classItem.name}</h2>
-            <p class="mt-1 text-sm text-[#67675F]">{new Date(classItem.startsAt).toLocaleString()}</p>
+            {classItem.isSeriesSummary ? (
+              <p class="mt-1 text-sm text-[#67675F]">
+                Recurring: {classItem.seriesWeekdayLabel} at {classItem.seriesTimeLabel} · {classItem.seriesRangeLabel}
+              </p>
+            ) : (
+              <p class="mt-1 text-sm text-[#67675F]">{new Date(classItem.startsAt).toLocaleString()}</p>
+            )}
             <p class="mt-2 text-xs text-[#67675F]">
-              {classItem.confirmedReservationsCount}/{classItem.capacity} confirmed · {classItem.reservationCount}{" "}
-              reservation records
+              {classItem.isSeriesSummary ? (
+                <>{classItem.seriesOccurrencesCount} occurrences</>
+              ) : (
+                <>
+                  {classItem.confirmedReservationsCount}/{classItem.capacity} confirmed
+                </>
+              )}
             </p>
+            {classItem.isSeriesSummary ? (
+              <p class="mt-1 text-xs text-[#67675F]">
+                {classItem.seriesNextClassLabel && classItem.seriesNextConfirmedLabel
+                  ? `Next class: ${classItem.seriesNextClassLabel}, ${classItem.seriesNextConfirmedLabel}`
+                  : "No upcoming scheduled classes in this series."}
+              </p>
+            ) : null}
           </div>
           <span
             class:list={[
@@ -42,19 +60,7 @@ const { classes } = Astro.props;
           <a href={`/manager/classes/${classItem.id}/attendees`} class="text-[#4F5A37] underline">
             Attendees
           </a>
-          {classItem.seriesId ? (
-            <form
-              method="post"
-              action={`/api/classes/${classItem.id}/series/stop`}
-              data-confirm-action="stopSeries"
-              data-class-name={classItem.name}
-            >
-              <button type="submit" class="text-[#8E4040] underline">
-                Stop series from this date
-              </button>
-            </form>
-          ) : null}
-          {classItem.reservationCount === 0 ? (
+          {!classItem.isSeriesSummary && classItem.reservationCount === 0 ? (
             <form
               method="post"
               action={`/api/classes/${classItem.id}/delete`}
@@ -65,7 +71,7 @@ const { classes } = Astro.props;
                 Delete
               </button>
             </form>
-          ) : classItem.status !== "cancelled" ? (
+          ) : !classItem.isSeriesSummary && classItem.status !== "cancelled" ? (
             <form
               method="post"
               action={`/api/classes/${classItem.id}/cancel`}
@@ -120,7 +126,6 @@ const { classes } = Astro.props;
   const actionLabels = {
     cancel: "cancel",
     delete: "delete",
-    stopSeries: "stop",
   };
 
   const confirmForms = document.querySelectorAll("form[data-confirm-action][data-class-name]");
@@ -148,11 +153,7 @@ const { classes } = Astro.props;
 
     const actionLabel = actionLabels[action] || "continue";
 
-    if (action === "stopSeries") {
-      messageNode.textContent = `Are you sure you want to stop all following classes in the recurring series: "${className}" from this date?`;
-    } else {
-      messageNode.textContent = `Are you sure you want to ${actionLabel} class: "${className}"?`;
-    }
+    messageNode.textContent = `Are you sure you want to ${actionLabel} class: "${className}"?`;
 
     pendingForm = form;
     modal.classList.remove("hidden");

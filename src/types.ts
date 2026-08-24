@@ -63,6 +63,8 @@ export interface UpdateClassInput {
 
 export interface ClassAttendeeItem {
   reservationId: string;
+  classId: string;
+  classStartsAt: string;
   userId: string;
   userEmail: string;
   status: "confirmed" | "cancelled";
