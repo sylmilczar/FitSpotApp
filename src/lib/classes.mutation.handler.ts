@@ -25,8 +25,27 @@ interface DateNormalizationFailure {
 
 export type DateNormalizationResult = DateNormalizationSuccess | DateNormalizationFailure;
 
+interface RecurringSeriesSuccess {
+  ok: true;
+  startsAtUtcList: string[];
+}
+
+interface RecurringSeriesFailure {
+  ok: false;
+  code:
+    | "INVALID_FORMAT"
+    | "REPEAT_UNTIL_REQUIRED"
+    | "REPEAT_UNTIL_INVALID"
+    | "REPEAT_UNTIL_BEFORE_START"
+    | "TOO_MANY_OCCURRENCES";
+  message: string;
+}
+
+type RecurringSeriesResult = RecurringSeriesSuccess | RecurringSeriesFailure;
+
 export interface ManagerClassItem {
   id: string;
+  seriesId: string | null;
   name: string;
   description: string | null;
   capacity: number;
@@ -38,6 +57,7 @@ export interface ManagerClassItem {
 
 interface ClassRow {
   id: string;
+  class_series_id: string | null;
   name: string;
   description: string | null;
   capacity: number;
@@ -46,6 +66,14 @@ interface ClassRow {
 }
 
 interface ClassStartsAtRow {
+  class_series_id: string | null;
+  starts_at: string;
+}
+
+const MAX_RECURRING_OCCURRENCES = 104;
+
+interface SeriesClassRow {
+  id: string;
   starts_at: string;
 }
 
@@ -117,10 +145,17 @@ export function normalizeLocalDateTime(localValue: string): DateNormalizationRes
   return { ok: true, startsAtUtc };
 }
 
-function normalizeClassPayload(
-  input: CreateClassInput,
-):
-  | { ok: true; data: { name: string; description: string | null; capacity: number; starts_at: string } }
+function normalizeClassPayload(input: CreateClassInput):
+  | {
+      ok: true;
+      data: {
+        name: string;
+        description: string | null;
+        capacity: number;
+        starts_at: string;
+      };
+      startsAtLocal: string;
+    }
   | { ok: false; result: ClassMutationResult } {
   const parsed = classPayloadSchema.safeParse(input);
 
@@ -145,7 +180,73 @@ function normalizeClassPayload(
       capacity: parsed.data.capacity,
       starts_at: dateResult.startsAtUtc,
     },
+    startsAtLocal: parsed.data.startsAt.trim(),
   };
+}
+
+function buildRecurringWeeklySeries(localStartsAt: string, repeatUntil: string | undefined): RecurringSeriesResult {
+  const trimmedRepeatUntil = (repeatUntil ?? "").trim();
+
+  if (!trimmedRepeatUntil) {
+    return {
+      ok: false,
+      code: "REPEAT_UNTIL_REQUIRED",
+      message: "Select an end date for recurring classes.",
+    };
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmedRepeatUntil)) {
+    return {
+      ok: false,
+      code: "REPEAT_UNTIL_INVALID",
+      message: "Enter a valid recurring end date.",
+    };
+  }
+
+  const startLocal = new Date(localStartsAt);
+  if (Number.isNaN(startLocal.getTime())) {
+    return {
+      ok: false,
+      code: "INVALID_FORMAT",
+      message: "Enter a valid class date and time.",
+    };
+  }
+
+  const repeatUntilInclusive = new Date(`${trimmedRepeatUntil}T23:59:59`);
+  if (Number.isNaN(repeatUntilInclusive.getTime())) {
+    return {
+      ok: false,
+      code: "REPEAT_UNTIL_INVALID",
+      message: "Enter a valid recurring end date.",
+    };
+  }
+
+  if (repeatUntilInclusive.getTime() < startLocal.getTime()) {
+    return {
+      ok: false,
+      code: "REPEAT_UNTIL_BEFORE_START",
+      message: "Recurring end date must be on or after the first class date.",
+    };
+  }
+
+  const startsAtUtcList: string[] = [];
+  const cursor = new Date(startLocal);
+
+  while (cursor.getTime() <= repeatUntilInclusive.getTime()) {
+    startsAtUtcList.push(cursor.toISOString());
+
+    if (startsAtUtcList.length > MAX_RECURRING_OCCURRENCES) {
+      return {
+        ok: false,
+        code: "TOO_MANY_OCCURRENCES",
+        message: `Recurring setup is too long. Please keep it under ${MAX_RECURRING_OCCURRENCES} occurrences.`,
+      };
+    }
+
+    cursor.setDate(cursor.getDate() + 7);
+  }
+
+  return { ok: true, startsAtUtcList };
 }
 
 async function getReservationRows(
@@ -166,6 +267,49 @@ export async function createClass(supabase: SupabaseClient, input: CreateClassIn
 
   if (!normalized.ok) {
     return normalized.result;
+  }
+
+  const isRecurring = input.isRecurring === true;
+
+  if (isRecurring) {
+    const series = buildRecurringWeeklySeries(normalized.startsAtLocal, input.repeatUntil);
+
+    if (!series.ok) {
+      return failure(series.code, series.message);
+    }
+
+    const repeatUntilDate = (input.repeatUntil ?? "").trim();
+    const { data: seriesRow, error: seriesError } = await supabase
+      .from("class_series")
+      .insert({
+        name: normalized.data.name,
+        description: normalized.data.description,
+        capacity: normalized.data.capacity,
+        starts_from: series.startsAtUtcList[0],
+        repeat_until: repeatUntilDate,
+      })
+      .select("id")
+      .single();
+
+    if (seriesError) {
+      return databaseFailure(seriesError, "Could not create class series.");
+    }
+
+    const rows = series.startsAtUtcList.map((startsAtUtc) => ({
+      class_series_id: seriesRow.id as string,
+      name: normalized.data.name,
+      description: normalized.data.description,
+      capacity: normalized.data.capacity,
+      starts_at: startsAtUtc,
+    }));
+
+    const { error } = await supabase.from("classes").insert(rows);
+
+    if (error) {
+      return databaseFailure(error, "Could not create recurring classes.");
+    }
+
+    return { ok: true };
   }
 
   const { data, error } = await supabase.from("classes").insert(normalized.data).select("id").single();
@@ -206,7 +350,7 @@ export async function updateClass(
 
   const { data: classRow, error: classError } = await supabase
     .from("classes")
-    .select("starts_at")
+    .select("starts_at, class_series_id")
     .eq("id", classId)
     .single<ClassStartsAtRow>();
 
@@ -216,6 +360,66 @@ export async function updateClass(
 
   const previousStartsAtMs = new Date(classRow.starts_at).getTime();
   const nextStartsAtMs = new Date(normalized.data.starts_at).getTime();
+
+  if (input.applyToSeries) {
+    if (!classRow.class_series_id) {
+      return failure("NOT_RECURRING", "This class is not part of a recurring series.");
+    }
+
+    if (previousStartsAtMs !== nextStartsAtMs) {
+      return failure(
+        "SERIES_START_CHANGE_UNSUPPORTED",
+        "Changing the start date/time for all following recurring classes is not supported yet.",
+      );
+    }
+
+    const { data: seriesClasses, error: seriesClassesError } = await supabase
+      .from("classes")
+      .select("id, starts_at")
+      .eq("class_series_id", classRow.class_series_id)
+      .gte("starts_at", classRow.starts_at)
+      .order("starts_at", { ascending: true });
+
+    if (seriesClassesError) {
+      return databaseFailure(seriesClassesError, "Could not load recurring classes.");
+    }
+
+    const typedSeriesClasses = seriesClasses as SeriesClassRow[];
+    const targetClassIds = typedSeriesClasses.map((item) => item.id);
+
+    if (targetClassIds.length === 0) {
+      return failure("NOT_RECURRING", "No upcoming recurring classes found to update.");
+    }
+
+    for (const targetClassId of targetClassIds) {
+      const reservationResult = await getReservationRows(supabase, targetClassId);
+
+      if (!reservationResult.ok) {
+        return reservationResult.result;
+      }
+
+      const targetConfirmedCount = reservationResult.rows.filter((row) => row.status === "confirmed").length;
+
+      if (normalized.data.capacity < targetConfirmedCount) {
+        return failure("CAPACITY_BELOW_RESERVATIONS", "Capacity cannot be lower than confirmed reservations.");
+      }
+    }
+
+    const { error: updateSeriesError } = await supabase
+      .from("classes")
+      .update({
+        name: normalized.data.name,
+        description: normalized.data.description,
+        capacity: normalized.data.capacity,
+      })
+      .in("id", targetClassIds);
+
+    if (updateSeriesError) {
+      return databaseFailure(updateSeriesError, "Could not update recurring classes.");
+    }
+
+    return { ok: true };
+  }
 
   if (confirmedCount > 0 && previousStartsAtMs !== nextStartsAtMs) {
     return failure(
@@ -271,12 +475,58 @@ export async function cancelClass(supabase: SupabaseClient, classId: string): Pr
   return { ok: true };
 }
 
+export async function stopSeriesFromClass(supabase: SupabaseClient, classId: string): Promise<ClassMutationResult> {
+  if (!uuidSchema.safeParse(classId).success) {
+    return failure("VALIDATION_ERROR", "Invalid class identifier.");
+  }
+
+  const { data: classRow, error: classError } = await supabase
+    .from("classes")
+    .select("starts_at, class_series_id")
+    .eq("id", classId)
+    .single<ClassStartsAtRow>();
+
+  if (classError) {
+    return databaseFailure(classError, "Could not load class details.");
+  }
+
+  if (!classRow.class_series_id) {
+    return failure("NOT_RECURRING", "This class is not part of a recurring series.");
+  }
+
+  const { error: seriesError } = await supabase
+    .from("class_series")
+    .update({
+      is_active: false,
+      disabled_from: classRow.starts_at,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", classRow.class_series_id);
+
+  if (seriesError) {
+    return databaseFailure(seriesError, "Could not disable recurring series.");
+  }
+
+  const { error: cancelFutureError } = await supabase
+    .from("classes")
+    .update({ status: "cancelled" })
+    .eq("class_series_id", classRow.class_series_id)
+    .gte("starts_at", classRow.starts_at)
+    .eq("status", "scheduled");
+
+  if (cancelFutureError) {
+    return databaseFailure(cancelFutureError, "Could not cancel future recurring classes.");
+  }
+
+  return { ok: true };
+}
+
 export async function listManagerClasses(
   supabase: SupabaseClient,
 ): Promise<{ ok: true; data: ManagerClassItem[] } | { ok: false; code: string; message: string }> {
   const { data: classes, error: classesError } = await supabase
     .from("classes")
-    .select("id, name, description, capacity, starts_at, status")
+    .select("id, class_series_id, name, description, capacity, starts_at, status")
     .order("starts_at", { ascending: true });
 
   if (classesError) {
@@ -309,6 +559,7 @@ export async function listManagerClasses(
       const counts = reservationCounts.get(classItem.id) ?? { total: 0, confirmed: 0 };
       return {
         id: classItem.id,
+        seriesId: classItem.class_series_id,
         name: classItem.name,
         description: classItem.description,
         capacity: classItem.capacity,

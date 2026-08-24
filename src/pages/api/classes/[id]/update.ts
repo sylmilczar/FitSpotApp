@@ -27,6 +27,7 @@ export const POST: APIRoute = async (context) => {
     description: getText("description"),
     capacity: Number(form.get("capacity")),
     startsAt: getText("startsAt"),
+    applyToSeries: form.get("applyToSeries") === "on",
   };
 
   const supabase = createClient(context.request.headers, context.cookies);

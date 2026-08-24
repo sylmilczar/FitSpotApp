@@ -27,6 +27,8 @@ export const POST: APIRoute = async (context) => {
     description: getText("description"),
     capacity,
     startsAt: getText("startsAt"),
+    isRecurring: form.get("isRecurring") === "on",
+    repeatUntil: getText("repeatUntil"),
   };
 
   const supabase = createClient(context.request.headers, context.cookies);
@@ -35,5 +37,9 @@ export const POST: APIRoute = async (context) => {
   }
 
   const result = await createClass(supabase, input);
-  return result.ok ? resultRedirect("CREATED") : resultRedirect(result.code);
+  if (!result.ok) {
+    return resultRedirect(result.code);
+  }
+
+  return resultRedirect(input.isRecurring ? "SERIES_CREATED" : "CREATED");
 };

@@ -49,9 +49,17 @@ export interface CreateClassInput {
   description?: string;
   capacity: number;
   startsAt: string;
+  isRecurring?: boolean;
+  repeatUntil?: string;
 }
 
-export type UpdateClassInput = CreateClassInput;
+export interface UpdateClassInput {
+  name: string;
+  description?: string;
+  capacity: number;
+  startsAt: string;
+  applyToSeries?: boolean;
+}
 
 export interface ClassAttendeeItem {
   reservationId: string;

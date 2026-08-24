@@ -42,6 +42,18 @@ const { classes } = Astro.props;
           <a href={`/manager/classes/${classItem.id}/attendees`} class="text-[#4F5A37] underline">
             Attendees
           </a>
+          {classItem.seriesId ? (
+            <form
+              method="post"
+              action={`/api/classes/${classItem.id}/series/stop`}
+              data-confirm-action="stopSeries"
+              data-class-name={classItem.name}
+            >
+              <button type="submit" class="text-[#8E4040] underline">
+                Stop series from this date
+              </button>
+            </form>
+          ) : null}
           {classItem.reservationCount === 0 ? (
             <form
               method="post"
@@ -108,6 +120,7 @@ const { classes } = Astro.props;
   const actionLabels = {
     cancel: "cancel",
     delete: "delete",
+    stopSeries: "stop",
   };
 
   const confirmForms = document.querySelectorAll("form[data-confirm-action][data-class-name]");
@@ -134,7 +147,13 @@ const { classes } = Astro.props;
     }
 
     const actionLabel = actionLabels[action] || "continue";
-    messageNode.textContent = `Are you sure you want to ${actionLabel} class: "${className}"?`;
+
+    if (action === "stopSeries") {
+      messageNode.textContent = `Are you sure you want to stop all following classes in the recurring series: "${className}" from this date?`;
+    } else {
+      messageNode.textContent = `Are you sure you want to ${actionLabel} class: "${className}"?`;
+    }
+
     pendingForm = form;
     modal.classList.remove("hidden");
     modal.classList.add("flex");

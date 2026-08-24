@@ -25,7 +25,9 @@ const archivedClasses = result.ok
 
 const resultFeedbackByCode: Record<string, { message: string; tone: "success" | "error" }> = {
   CREATED: { message: "Class created successfully.", tone: "success" },
+  SERIES_CREATED: { message: "Recurring class series created successfully.", tone: "success" },
   UPDATED: { message: "Class updated successfully.", tone: "success" },
+  SERIES_STOPPED: { message: "Recurring series was disabled from the selected date.", tone: "success" },
   DELETED: { message: "Class deleted successfully.", tone: "success" },
   CANCELLED: { message: "Class cancelled successfully.", tone: "success" },
   CONFIG_ERROR: { message: "Configuration issue. Please contact support.", tone: "error" },
@@ -33,6 +35,21 @@ const resultFeedbackByCode: Record<string, { message: string; tone: "success" | 
   VALIDATION_ERROR: { message: "Some class data is invalid. Please review the form.", tone: "error" },
   INVALID_FORMAT: { message: "Enter a valid class date and time.", tone: "error" },
   PAST_DATE: { message: "Class must start in the future.", tone: "error" },
+  REPEAT_UNTIL_REQUIRED: { message: "Select an end date for recurring classes.", tone: "error" },
+  REPEAT_UNTIL_INVALID: { message: "Enter a valid recurring end date.", tone: "error" },
+  REPEAT_UNTIL_BEFORE_START: {
+    message: "Recurring end date must be on or after the first class date.",
+    tone: "error",
+  },
+  TOO_MANY_OCCURRENCES: {
+    message: "Recurring setup is too long. Shorten the date range and try again.",
+    tone: "error",
+  },
+  NOT_RECURRING: { message: "This class is not part of a recurring series.", tone: "error" },
+  SERIES_START_CHANGE_UNSUPPORTED: {
+    message: "Changing start date/time for all following recurring classes is not supported yet.",
+    tone: "error",
+  },
   CAPACITY_BELOW_RESERVATIONS: {
     message: "Capacity cannot be lower than confirmed reservations.",
     tone: "error",
