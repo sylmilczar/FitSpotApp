@@ -4,7 +4,6 @@ import { createClass, normalizeLocalDateTime, updateClass } from "@/lib/classes.
 import type { CreateClassInput, UpdateClassInput } from "@/types";
 
 const CLASS_ID = "11111111-1111-1111-1111-111111111111";
-const SERIES_CLASS_ID = "22222222-2222-2222-2222-222222222222";
 const FUTURE_START = "2026-09-10T12:00";
 
 function asSupabaseClient(from: ReturnType<typeof vi.fn>): SupabaseClient {
@@ -17,57 +16,12 @@ function createNoWriteClient() {
   return { client: asSupabaseClient(from), from };
 }
 
-interface UpdateClientOptions {
-  reservationsByClass?: Record<string, ("confirmed" | "cancelled")[]>;
-  classRow?: { starts_at: string; class_series_id: string | null };
-  seriesClasses?: { id: string; starts_at: string }[];
-}
+function createUpdateClient(
+  result: { data: unknown; error: { message: string } | null } = { data: { ok: true }, error: null },
+) {
+  const rpc = vi.fn().mockResolvedValue(result);
 
-function createUpdateClient(options: UpdateClientOptions = {}) {
-  const reservationsByClass = options.reservationsByClass ?? {};
-  const classRow = options.classRow ?? {
-    starts_at: new Date(FUTURE_START).toISOString(),
-    class_series_id: null,
-  };
-  const seriesClasses = options.seriesClasses ?? [];
-  const update = vi.fn((payload: unknown) => ({
-    eq: vi.fn().mockResolvedValue({ error: null }),
-    in: vi.fn().mockResolvedValue({ error: null }),
-    payload,
-  }));
-  const from = vi.fn((table: string) => {
-    if (table === "reservations") {
-      return {
-        select: vi.fn(() => ({
-          eq: vi.fn((_column: string, classId: string) =>
-            Promise.resolve({
-              data: (reservationsByClass[classId] ?? []).map((status) => ({ class_id: classId, status })),
-              error: null,
-            }),
-          ),
-        })),
-      };
-    }
-
-    return {
-      select: vi.fn((columns: string) => ({
-        eq: vi.fn(() => {
-          if (columns === "starts_at, class_series_id") {
-            return { single: vi.fn().mockResolvedValue({ data: classRow, error: null }) };
-          }
-
-          return {
-            gte: vi.fn(() => ({
-              order: vi.fn().mockResolvedValue({ data: seriesClasses, error: null }),
-            })),
-          };
-        }),
-      })),
-      update,
-    };
-  });
-
-  return { client: asSupabaseClient(from), from, update };
+  return { client: { rpc } as unknown as SupabaseClient, rpc };
 }
 
 const validCreateInput: CreateClassInput = {
@@ -174,66 +128,59 @@ describe("updateClass guardrails", () => {
   });
 
   it("rejects capacity below confirmed reservations without writing", async () => {
-    const { client, update } = createUpdateClient({
-      reservationsByClass: { [CLASS_ID]: ["confirmed", "confirmed", "cancelled"] },
+    const { client } = createUpdateClient({
+      data: null,
+      error: { message: "CAPACITY_BELOW_RESERVATIONS" },
     });
 
     await expect(updateClass(client, CLASS_ID, { ...validUpdateInput, capacity: 1 })).resolves.toMatchObject({
       ok: false,
       code: "CAPACITY_BELOW_RESERVATIONS",
     });
-    expect(update).not.toHaveBeenCalled();
   });
 
   it("rejects a start-time change with confirmed reservations without writing", async () => {
-    const { client, update } = createUpdateClient({
-      reservationsByClass: { [CLASS_ID]: ["confirmed"] },
+    const { client } = createUpdateClient({
+      data: null,
+      error: { message: "STARTS_AT_LOCKED" },
     });
 
     await expect(
       updateClass(client, CLASS_ID, { ...validUpdateInput, startsAt: "2026-09-10T13:00" }),
     ).resolves.toMatchObject({ ok: false, code: "STARTS_AT_LOCKED" });
-    expect(update).not.toHaveBeenCalled();
   });
 
   it("allows an unchanged start time when reservations exist", async () => {
-    const { client, update } = createUpdateClient({
-      reservationsByClass: { [CLASS_ID]: ["confirmed"] },
-    });
+    const { client, rpc } = createUpdateClient();
 
     await expect(updateClass(client, CLASS_ID, validUpdateInput)).resolves.toEqual({ ok: true });
-    expect(update).toHaveBeenCalledOnce();
+    expect(rpc).toHaveBeenCalledWith("update_manager_class", {
+      p_class_id: CLASS_ID,
+      p_name: validUpdateInput.name,
+      p_description: validUpdateInput.description,
+      p_capacity: validUpdateInput.capacity,
+      p_starts_at: new Date(FUTURE_START).toISOString(),
+      p_apply_to_series: false,
+    });
   });
 
   it("rejects applying a series update to a standalone class without writing", async () => {
-    const { client, update } = createUpdateClient();
+    const { client } = createUpdateClient({ data: null, error: { message: "NOT_RECURRING" } });
 
     await expect(updateClass(client, CLASS_ID, { ...validUpdateInput, applyToSeries: true })).resolves.toMatchObject({
       ok: false,
       code: "NOT_RECURRING",
     });
-    expect(update).not.toHaveBeenCalled();
   });
 
   it("rejects a capacity conflict in any series member without writing", async () => {
-    const { client, update } = createUpdateClient({
-      classRow: {
-        starts_at: new Date(FUTURE_START).toISOString(),
-        class_series_id: "series-id",
-      },
-      seriesClasses: [
-        { id: CLASS_ID, starts_at: new Date(FUTURE_START).toISOString() },
-        { id: SERIES_CLASS_ID, starts_at: new Date("2026-09-17T12:00").toISOString() },
-      ],
-      reservationsByClass: {
-        [CLASS_ID]: [],
-        [SERIES_CLASS_ID]: ["confirmed", "confirmed", "confirmed"],
-      },
+    const { client } = createUpdateClient({
+      data: null,
+      error: { message: "CAPACITY_BELOW_RESERVATIONS" },
     });
 
     await expect(
       updateClass(client, CLASS_ID, { ...validUpdateInput, capacity: 2, applyToSeries: true }),
     ).resolves.toMatchObject({ ok: false, code: "CAPACITY_BELOW_RESERVATIONS" });
-    expect(update).not.toHaveBeenCalled();
   });
 });

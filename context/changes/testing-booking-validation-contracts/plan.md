@@ -275,10 +275,10 @@ The new migration adds functions/triggers without rewriting existing rows. Rollb
 
 #### Automated
 
-- [ ] 2.1 Database rebuild applies every migration and seed cleanly
-- [ ] 2.2 Supabase contract suite passes from a reset database
-- [ ] 2.3 Fast regression suite still passes
-- [ ] 2.4 Types, lint, and production build pass
+- [x] 2.1 Database rebuild applies every migration and seed cleanly
+- [x] 2.2 Supabase contract suite passes from a reset database
+- [x] 2.3 Fast regression suite still passes
+- [x] 2.4 Types, lint, and production build pass
 
 #### Manual
 

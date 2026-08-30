@@ -85,11 +85,6 @@ interface ClassSeriesMemberRow {
 
 const MAX_RECURRING_OCCURRENCES = 104;
 
-interface SeriesClassRow {
-  id: string;
-  starts_at: string;
-}
-
 interface ReservationCountRow {
   class_id: string;
   status: "confirmed" | "cancelled";
@@ -115,6 +110,23 @@ const attendeeRpcResponseSchema = z.object({
   data: z.unknown(),
   error: z.object({ message: z.string() }).nullable(),
 });
+
+const managerUpdateRpcResponseSchema = z.object({
+  data: z.unknown(),
+  error: z.object({ message: z.string() }).nullable(),
+});
+
+const managerUpdateCodes = [
+  "CAPACITY_BELOW_RESERVATIONS",
+  "STARTS_AT_LOCKED",
+  "NOT_RECURRING",
+  "SERIES_START_CHANGE_UNSUPPORTED",
+] as const;
+
+function extractManagerUpdateCode(message: string): (typeof managerUpdateCodes)[number] | null {
+  const upperMessage = message.toUpperCase();
+  return managerUpdateCodes.find((code) => upperMessage.includes(code)) ?? null;
+}
 
 function failure(code: string, message: string): ClassMutationResult {
   return { ok: false, code, message };
@@ -358,105 +370,33 @@ export async function updateClass(
     return normalized.result;
   }
 
-  const reservationResult = await getReservationRows(supabase, classId);
+  let rpcResponse: z.infer<typeof managerUpdateRpcResponseSchema>;
 
-  if (!reservationResult.ok) {
-    return reservationResult.result;
-  }
-
-  const confirmedCount = reservationResult.rows.filter((row) => row.status === "confirmed").length;
-
-  if (normalized.data.capacity < confirmedCount) {
-    return failure("CAPACITY_BELOW_RESERVATIONS", "Capacity cannot be lower than confirmed reservations.");
-  }
-
-  const { data: classRow, error: classError } = await supabase
-    .from("classes")
-    .select("starts_at, class_series_id")
-    .eq("id", classId)
-    .single<ClassStartsAtRow>();
-
-  if (classError) {
-    return databaseFailure(classError, "Could not load class details.");
-  }
-
-  const previousStartsAtMs = new Date(classRow.starts_at).getTime();
-  const nextStartsAtMs = new Date(normalized.data.starts_at).getTime();
-
-  if (input.applyToSeries) {
-    if (!classRow.class_series_id) {
-      return failure("NOT_RECURRING", "This class is not part of a recurring series.");
-    }
-
-    if (previousStartsAtMs !== nextStartsAtMs) {
-      return failure(
-        "SERIES_START_CHANGE_UNSUPPORTED",
-        "Changing the start date/time for all following recurring classes is not supported yet.",
-      );
-    }
-
-    const { data: seriesClasses, error: seriesClassesError } = await supabase
-      .from("classes")
-      .select("id, starts_at")
-      .eq("class_series_id", classRow.class_series_id)
-      .gte("starts_at", classRow.starts_at)
-      .order("starts_at", { ascending: true });
-
-    if (seriesClassesError) {
-      return databaseFailure(seriesClassesError, "Could not load recurring classes.");
-    }
-
-    const typedSeriesClasses = seriesClasses as SeriesClassRow[];
-    const targetClassIds = typedSeriesClasses.map((item) => item.id);
-
-    if (targetClassIds.length === 0) {
-      return failure("NOT_RECURRING", "No upcoming recurring classes found to update.");
-    }
-
-    for (const targetClassId of targetClassIds) {
-      const reservationResult = await getReservationRows(supabase, targetClassId);
-
-      if (!reservationResult.ok) {
-        return reservationResult.result;
-      }
-
-      const targetConfirmedCount = reservationResult.rows.filter((row) => row.status === "confirmed").length;
-
-      if (normalized.data.capacity < targetConfirmedCount) {
-        return failure("CAPACITY_BELOW_RESERVATIONS", "Capacity cannot be lower than confirmed reservations.");
-      }
-    }
-
-    const { error: updateSeriesError } = await supabase
-      .from("classes")
-      .update({
-        name: normalized.data.name,
-        description: normalized.data.description,
-        capacity: normalized.data.capacity,
-      })
-      .in("id", targetClassIds);
-
-    if (updateSeriesError) {
-      return databaseFailure(updateSeriesError, "Could not update recurring classes.");
-    }
-
-    return { ok: true };
-  }
-
-  if (confirmedCount > 0 && previousStartsAtMs !== nextStartsAtMs) {
-    return failure(
-      "STARTS_AT_LOCKED",
-      "Start date and time cannot be changed while the class has confirmed reservations.",
+  try {
+    rpcResponse = managerUpdateRpcResponseSchema.parse(
+      await supabase.rpc("update_manager_class", {
+        p_class_id: classId,
+        p_name: normalized.data.name,
+        p_description: normalized.data.description,
+        p_capacity: normalized.data.capacity,
+        p_starts_at: normalized.data.starts_at,
+        p_apply_to_series: input.applyToSeries === true,
+      }),
     );
+  } catch {
+    return failure("DATABASE_ERROR", "Unexpected update_manager_class RPC result");
   }
 
-  const { error } = await supabase.from("classes").update(normalized.data).eq("id", classId);
+  const { data, error } = rpcResponse;
 
   if (error) {
-    return databaseFailure(error, "Could not update class.");
+    const code = extractManagerUpdateCode(error.message);
+    return code ? failure(code, error.message) : databaseFailure(error, "Could not update class.");
   }
 
-  return { ok: true };
+  return typeof data === "object" && data !== null && "ok" in data && data.ok === true
+    ? { ok: true }
+    : failure("DATABASE_ERROR", "Unexpected update_manager_class RPC result");
 }
 
 export async function deleteClass(supabase: SupabaseClient, classId: string): Promise<ClassMutationResult> {
