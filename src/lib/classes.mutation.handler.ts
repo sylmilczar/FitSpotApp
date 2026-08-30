@@ -126,8 +126,9 @@ function databaseFailure(error: { message: string } | null, fallback: string): C
 
 export function normalizeLocalDateTime(localValue: string): DateNormalizationResult {
   const trimmedValue = localValue.trim();
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(trimmedValue);
 
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(trimmedValue)) {
+  if (!match) {
     return {
       ok: false,
       code: "INVALID_FORMAT",
@@ -136,8 +137,16 @@ export function normalizeLocalDateTime(localValue: string): DateNormalizationRes
   }
 
   const localDate = new Date(trimmedValue);
+  const [, year, month, day, hours, minutes] = match;
 
-  if (Number.isNaN(localDate.getTime())) {
+  if (
+    Number.isNaN(localDate.getTime()) ||
+    localDate.getFullYear() !== Number(year) ||
+    localDate.getMonth() + 1 !== Number(month) ||
+    localDate.getDate() !== Number(day) ||
+    localDate.getHours() !== Number(hours) ||
+    localDate.getMinutes() !== Number(minutes)
+  ) {
     return {
       ok: false,
       code: "INVALID_FORMAT",
