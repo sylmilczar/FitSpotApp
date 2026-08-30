@@ -391,9 +391,7 @@ export async function updateClass(
 
   if (error) {
     const code = extractManagerUpdateCode(error.message);
-    // return code ? failure(code, error.message) : databaseFailure(error, "Could not update class.");
-    console.log(error.message);
-    return failure("DATABASE_ERROR", error.message);
+    return code ? failure(code, error.message) : databaseFailure(error, "Could not update class.");
   }
 
   return typeof data === "object" && data !== null && "ok" in data && data.ok === true
