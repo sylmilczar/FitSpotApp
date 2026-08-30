@@ -1,4 +1,6 @@
 ---
+import { MANAGER_CLASSES_ROUTE } from "@/lib/routing";
+
 const variant = Astro.props.variant === "light" ? "light" : "dark";
 const { user } = Astro.locals;
 const { role } = Astro.locals;
@@ -33,7 +35,7 @@ const signUpHref = `/auth/signup?returnTo=${encodedReturnTo}`;
             Classes
           </a>
           {isPrivileged ? (
-            <a href="/manager/classes" class:list={[linkClass]}>
+            <a href={MANAGER_CLASSES_ROUTE} class:list={[linkClass]}>
               Manage classes
             </a>
           ) : null}
