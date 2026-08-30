@@ -3,7 +3,7 @@ project: FitSpotApp for a Small Fitness Club
 version: 1
 status: draft
 created: 2026-06-29
-updated: 2026-08-21
+updated: 2026-08-30
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -29,7 +29,7 @@ W obecnym stanie rezerwacje zajec sa rozproszone miedzy telefon i komunikatory, 
 
 | ID | Change ID | Outcome (user can ...) | Prerequisites | PRD refs | Status |
 |---|---|---|---|---|---|
-| F-01 | booking-domain-foundation | (foundation) minimalny kontrakt domeny rezerwacji i dostepnosci jest gotowy pod flow klienta | — | FR-003, FR-004, FR-005, FR-007, Business Logic, Non-Functional Requirements | ready |
+| F-01 | booking-domain-foundation | (foundation) minimalny kontrakt domeny rezerwacji i dostepnosci jest gotowy pod flow klienta | — | FR-003, FR-004, FR-005, FR-007, Business Logic, Non-Functional Requirements | done |
 | F-02 | admin-access-foundation | (foundation) minimalny kontrakt uprawnien dla roli client/manager/admin jest gotowy | — | Access Control, FR-008, FR-009, FR-010 | done |
 | F-03 | app-routing-foundation | (foundation) user niezalogowany trafia na publiczna strone glowna i moze przejsc do auth lub grafiku zajec; dashboard nie jest czescia glownego flow | S-01 | FR-001, FR-002, FR-003 | done |
 | S-01 | client-auth-journey | user can create an account and sign in to enter protected booking flow | — | FR-001, FR-002 | done |
@@ -74,7 +74,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Bez tego fundamentu szybkie wdrazanie funkcji moze naruszyc guardraile i wymusic kosztowne poprawki.
-- **Status:** ready
+- **Status:** done
 
 ### F-02: Kontrakt operacji administracyjnych i uprawnien
 
@@ -204,5 +204,7 @@ This table is the clean handoff to Jira/Linear or any MCP-backed backlog. Includ
 - **S-03: user can browse upcoming classes and view available spots in class details.** - Archived 2026-07-29 -> `context/archive/2026-07-29-browse-classes-with-availability/`. Lesson: —.
 
 - **S-02: user can reserve an eligible class and see it in upcoming reservations with spot updates.** - Archived 2026-08-21 -> `context/archive/2026-07-29-reserve-class-with-guardrails/`. Lesson: —.
+
+- **F-01: (foundation) zasady pojemnosci, blokady duplikatu i blokady po starcie zajec sa jednoznaczne i gotowe do uzycia przez flow klienta.** - Archived 2026-08-30 -> `context/archive/2026-06-30-booking-domain-foundation/`. Lesson: —.
 
 - **<Slice ID>: <Outcome>** - Archived <YYYY-MM-DD> -> context/archive/<YYYY-MM-DD-change-id>/. Lesson: <pointer to lessons.md if any, or ->.
