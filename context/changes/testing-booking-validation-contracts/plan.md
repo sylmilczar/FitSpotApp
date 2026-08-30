@@ -266,10 +266,10 @@ The new migration adds functions/triggers without rewriting existing rows. Rollb
 
 #### Automated
 
-- [x] 1.1 Fast suite passes
-- [x] 1.2 Test files type-check with the project
-- [x] 1.3 Test configuration and source pass lint
-- [x] 1.4 Production build remains valid
+- [x] 1.1 Fast suite passes — 00542f9
+- [x] 1.2 Test files type-check with the project — 00542f9
+- [x] 1.3 Test configuration and source pass lint — 00542f9
+- [x] 1.4 Production build remains valid — 00542f9
 
 ### Phase 2: Atomic Manager Mutation and Supabase Contracts
 
