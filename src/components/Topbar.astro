@@ -8,14 +8,22 @@ const isPrivileged = role === "manager" || role === "admin";
 
 const containerClass =
   variant === "light"
-    ? "mb-6 flex items-center justify-between rounded-2xl border border-[#E6E6DD] bg-[#FFFFFF] px-4 py-3 text-sm text-[#1F1F1A]"
-    : "mb-4 flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80";
+    ? "mb-6 rounded-2xl border border-[#E6E6DD] bg-[#FFFFFF] px-4 py-3 text-sm text-[#1F1F1A]"
+    : "mb-4 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80";
 
-const mutedTextClass = variant === "light" ? "text-[#67675F]" : "text-blue-100/70";
+const mutedTextClass =
+  variant === "light" ? "text-[#67675F]" : "text-blue-100/70";
+
 const linkClass =
   variant === "light"
     ? "text-[#4F5A37] transition-colors hover:text-[#97A354] hover:underline"
     : "text-purple-300 transition-colors hover:text-purple-100 hover:underline";
+
+const userStatusClass =
+  variant === "light"
+    ? "border-[#D9DEB8] bg-[#F3F5E8] text-[#4F5A37]"
+    : "border-white/10 bg-white/10 text-blue-100/80";
+
 const returnTo = `${Astro.url.pathname}${Astro.url.search}`;
 const encodedReturnTo = encodeURIComponent(returnTo);
 const signInHref = `/auth/signin?returnTo=${encodedReturnTo}`;
@@ -23,21 +31,34 @@ const signUpHref = `/auth/signup?returnTo=${encodedReturnTo}`;
 ---
 
 <div class:list={[containerClass]}>
-    <div class="flex items-center gap-4">
-      <img src="/fit_app_logo.png" alt="FitSpot Club logo" class="h-10 w-auto" />
+  <div class="flex items-center justify-between gap-4">
+    <!-- Logo + user status -->
+    <div class="flex min-w-0 items-center gap-4">
+      <img
+        src="/fit_app_logo.png"
+        alt="FitSpot Club logo"
+        class="h-10 w-auto shrink-0"
+      />
 
-      {
-        user ? (
-          <span class:list={[mutedTextClass]}>{user.email}</span>
-        ) : (
-          <span class:list={[mutedTextClass]}>Not signed in</span>
-        )
-      }
+      <span
+        class:list={[
+          "hidden max-w-[240px] truncate rounded-full border px-3 py-1 text-xs font-medium sm:inline",
+          userStatusClass,
+        ]}
+      >
+        {user ? user.email : "Not signed in"}
+      </span>
     </div>
 
-    <div class="flex items-center gap-3">
-      <a href="/" class:list={[linkClass]}> Home </a>
-      <a href="/classes" class:list={[linkClass]}> Classes </a>
+    <!-- Desktop navigation -->
+    <nav class="hidden items-center gap-3 sm:flex">
+      <a href="/" class:list={[linkClass]}>
+        Home
+      </a>
+
+      <a href="/classes" class:list={[linkClass]}>
+        Classes
+      </a>
 
       {
         isPrivileged ? (
@@ -59,11 +80,83 @@ const signUpHref = `/auth/signup?returnTo=${encodedReturnTo}`;
             <a href={signInHref} class:list={[linkClass]}>
               Sign in
             </a>
+
             <a href={signUpHref} class:list={[linkClass]}>
               Sign up
             </a>
           </>
         )
       }
-    </div>
+    </nav>
+
+    <!-- Mobile menu -->
+    <details class="relative sm:hidden">
+      <summary
+        class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg border border-[#E6E6DD] text-[#4F5A37] transition-colors hover:bg-[#F8F8F5]"
+        aria-label="Open navigation menu"
+      >
+        <span class="text-xl leading-none">☰</span>
+      </summary>
+
+      <nav
+        class="absolute right-0 z-30 mt-2 w-48 rounded-xl border border-[#E6E6DD] bg-white p-2 shadow-lg"
+      >
+        <a
+          href="/"
+          class="block rounded-lg px-3 py-2.5 text-sm text-[#4F5A37] hover:bg-[#F8F8F5]"
+        >
+          Home
+        </a>
+
+        <a
+          href="/classes"
+          class="block rounded-lg px-3 py-2.5 text-sm text-[#4F5A37] hover:bg-[#F8F8F5]"
+        >
+          Classes
+        </a>
+
+        {
+          isPrivileged ? (
+            <a
+              href={MANAGER_CLASSES_ROUTE}
+              class="block rounded-lg px-3 py-2.5 text-sm text-[#4F5A37] hover:bg-[#F8F8F5]"
+            >
+              Manage classes
+            </a>
+          ) : null
+        }
+
+        <div class="my-1 border-t border-[#E6E6DD]"></div>
+
+        {
+          user ? (
+            <form method="POST" action="/api/auth/signout">
+              <button
+                type="submit"
+                class="block w-full rounded-lg px-3 py-2.5 text-left text-sm text-[#4F5A37] hover:bg-[#F8F8F5]"
+              >
+                Sign out
+              </button>
+            </form>
+          ) : (
+            <>
+              <a
+                href={signInHref}
+                class="block rounded-lg px-3 py-2.5 text-sm text-[#4F5A37] hover:bg-[#F8F8F5]"
+              >
+                Sign in
+              </a>
+
+              <a
+                href={signUpHref}
+                class="block rounded-lg px-3 py-2.5 text-sm text-[#4F5A37] hover:bg-[#F8F8F5]"
+              >
+                Sign up
+              </a>
+            </>
+          )
+        }
+      </nav>
+    </details>
+  </div>
 </div>
