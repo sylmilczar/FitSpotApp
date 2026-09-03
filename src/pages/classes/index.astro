@@ -114,27 +114,41 @@ function formatClassTime(startsAtIso: string) {
       {
         result.ok ? (
           <>
-            <div class="overflow-x-auto rounded-2xl border border-[#E6E6DD] bg-[#FFFFFF] shadow-[0_10px_24px_rgba(79,90,55,0.08)]">
-              <table class="min-w-[900px] border-collapse text-sm">
-                <thead>
+            <div class="max-h-[70vh] overflow-auto rounded-2xl border border-[#E6E6DD] bg-[#FFFFFF] shadow-[0_10px_24px_rgba(79,90,55,0.08)]">
+              <table class="w-full min-w-[820px] border-collapse text-xs">
+                <thead class="sticky top-0 z-20">
                   <tr class="border-b border-[#E6E6DD] bg-[#F8F8F5]">
-                    <th class="w-28 px-4 py-4 text-left font-semibold text-[#4F5A37]">Hour</th>
-                    {days.map((day) => (
-                      <th class="min-w-[120px] px-4 py-4 text-left font-semibold text-[#4F5A37]">{day.label}</th>
+                    <th class="w-20 border-r border-[#EEEEEA] px-3 py-2 text-left font-semibold text-[#4F5A37]">
+                      Hour
+                    </th>
+
+                    {days.map((day, index) => (
+                      <th
+                        class:list={[
+                          "min-w-[105px] px-3 py-2 text-left font-semibold text-[#4F5A37]",
+                          index < days.length - 1 ? "border-r border-[#EEEEEA]" : "",
+                        ]}
+                      >
+                        {day.label}
+                      </th>
                     ))}
                   </tr>
                 </thead>
+
                 <tbody>
                   {hours.map((hour) => (
-                    <tr class="border-b border-[#E6E6DD] align-top">
-                      <th class="px-4 py-4 text-left font-semibold text-[#67675F]">{formatHour(hour)}</th>
-                      {days.map((day) => {
+                    <tr class="border-b border-[#EEEEDD] align-top last:border-b-0">
+                      <th class="border-r border-[#EEEEEA] px-3 py-2 text-left font-semibold text-[#67675F]">
+                        {formatHour(hour)}
+                      </th>
+
+                      {days.map((day, index) => {
                         const classesInCell = getClassCellItems(result.data, day.date, hour);
 
                         return (
-                          <td class="px-3 py-3">
+                          <td class:list={["px-2 py-2", index < days.length - 1 ? "border-r border-[#EEEEEA]" : ""]}>
                             {classesInCell.length > 0 ? (
-                              <div class="space-y-2">
+                              <div class="space-y-1.5">
                                 {classesInCell.map((classItem) => {
                                   const isUnavailable = classItem.isStarted || classItem.isFull;
                                   const isReserved = reservedClassIds.has(classItem.id);
@@ -143,24 +157,27 @@ function formatClassTime(startsAtIso: string) {
                                     <a
                                       href={`/classes/${classItem.id}`}
                                       class:list={[
-                                        "block rounded-xl border px-3 py-2 transition-colors",
+                                        "block rounded-lg border px-2.5 py-1.5 transition-colors",
                                         isUnavailable
                                           ? "border-[#D7A441]/40 bg-[#D7A441]/10 text-[#7A5A1F]"
                                           : "border-[#D9DEB8] bg-[#D9DEB8]/35 text-[#4F5A37] hover:bg-[#D9DEB8]/55",
                                       ]}
                                     >
-                                      <p class="text-xs font-semibold tracking-wide uppercase">
+                                      <p class="text-[10px] font-semibold tracking-wide uppercase">
                                         {formatClassTime(classItem.startsAt)}
                                       </p>
-                                      <p class="mt-1 flex items-center gap-2 text-sm font-semibold">
+
+                                      <p class="mt-0.5 flex items-center gap-1 text-xs leading-tight font-semibold">
                                         <span>{classItem.name}</span>
+
                                         {isReserved ? (
                                           <span title="Reserved" aria-label="Reserved">
                                             ☑️
                                           </span>
                                         ) : null}
                                       </p>
-                                      <p class="mt-1 text-xs">
+
+                                      <p class="mt-0.5 text-[10px] leading-tight">
                                         {isUnavailable
                                           ? "Unavailable"
                                           : `${classItem.availableSpots}/${classItem.capacity} available`}
@@ -170,9 +187,7 @@ function formatClassTime(startsAtIso: string) {
                                 })}
                               </div>
                             ) : (
-                              <div class="rounded-xl border border-transparent px-3 py-6 text-center text-xs text-[#9A9A92]">
-                                -
-                              </div>
+                              <div class="px-2 py-2 text-center text-[10px] text-[#B0B0A8]">-</div>
                             )}
                           </td>
                         );
