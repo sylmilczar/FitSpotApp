@@ -7,19 +7,23 @@ import Topbar from "@/components/Topbar.astro";
     <Topbar variant="light" />
 
     <div class="rounded-3xl border border-[#D9DEB8] bg-[#F8F8F5] p-8 sm:p-10">
-      <div class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-        <div>
-          <p
-            class="inline-flex rounded-full border border-[#C9D09A] bg-[#EEF1DB] px-3 py-1 text-xs font-semibold tracking-[0.18em] text-[#4F5A37] uppercase"
-          >
-            FitSpot Club
-          </p>
-          <h1 class="mt-5 max-w-xl text-4xl leading-tight font-bold text-[#1F1F1A] sm:text-5xl">
+      <div>
+        <p
+          class="inline-flex rounded-full border border-[#C9D09A] bg-[#EEF1DB] px-3 py-1 text-xs font-semibold tracking-[0.18em] text-[#4F5A37] uppercase"
+        >
+          FitSpot Club
+        </p>
+        <div class="mt-5 flex items-center gap-5">
+          <h1 class="text-4xl leading-tight font-bold text-[#1F1F1A] sm:text-5xl">
             Train consistently without booking chaos.
           </h1>
-          <p class="mt-4 max-w-xl text-base text-[#67675F] sm:text-lg">
-            FitSpot is a boutique fitness club where you can quickly check class schedules and reserve your spot.
-          </p>
+        </div>
+        <p class="mt-4 text-base text-[#67675F] sm:text-lg">
+          FitSpot is a boutique fitness club where you can quickly check class schedules and reserve your spot.
+        </p>
+      </div>
+      <div class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+        <div>
           <div class="mt-5 flex flex-wrap gap-3 text-sm font-medium text-[#4F5A37]">
             <span class="rounded-lg border border-[#D9DEB8] bg-white px-3 py-2">Small group coaching</span>
             <span class="rounded-lg border border-[#D9DEB8] bg-white px-3 py-2">Fast online booking</span>

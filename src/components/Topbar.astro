@@ -23,47 +23,47 @@ const signUpHref = `/auth/signup?returnTo=${encodedReturnTo}`;
 ---
 
 <div class:list={[containerClass]}>
-  {
-    user ? (
-      <>
-        <span class:list={[mutedTextClass]}>{user.email}</span>
-        <div class="flex items-center gap-3">
-          <a href="/" class:list={[linkClass]}>
-            Home
+    <div class="flex items-center gap-4">
+      <img src="/fit_app_logo.png" alt="FitSpot Club logo" class="h-10 w-auto" />
+
+      {
+        user ? (
+          <span class:list={[mutedTextClass]}>{user.email}</span>
+        ) : (
+          <span class:list={[mutedTextClass]}>Not signed in</span>
+        )
+      }
+    </div>
+
+    <div class="flex items-center gap-3">
+      <a href="/" class:list={[linkClass]}> Home </a>
+      <a href="/classes" class:list={[linkClass]}> Classes </a>
+
+      {
+        isPrivileged ? (
+          <a href={MANAGER_CLASSES_ROUTE} class:list={[linkClass]}>
+            Manage classes
           </a>
-          <a href="/classes" class:list={[linkClass]}>
-            Classes
-          </a>
-          {isPrivileged ? (
-            <a href={MANAGER_CLASSES_ROUTE} class:list={[linkClass]}>
-              Manage classes
-            </a>
-          ) : null}
+        ) : null
+      }
+
+      {
+        user ? (
           <form method="POST" action="/api/auth/signout">
             <button type="submit" class:list={[linkClass]}>
               Sign out
             </button>
           </form>
-        </div>
-      </>
-    ) : (
-      <>
-        <span class:list={[mutedTextClass]}>Not signed in</span>
-        <div class="flex gap-3">
-          <a href="/" class:list={[linkClass]}>
-            Home
-          </a>
-          <a href="/classes" class:list={[linkClass]}>
-            Classes
-          </a>
-          <a href={signInHref} class:list={[linkClass]}>
-            Sign in
-          </a>
-          <a href={signUpHref} class:list={[linkClass]}>
-            Sign up
-          </a>
-        </div>
-      </>
-    )
-  }
+        ) : (
+          <>
+            <a href={signInHref} class:list={[linkClass]}>
+              Sign in
+            </a>
+            <a href={signUpHref} class:list={[linkClass]}>
+              Sign up
+            </a>
+          </>
+        )
+      }
+    </div>
 </div>
