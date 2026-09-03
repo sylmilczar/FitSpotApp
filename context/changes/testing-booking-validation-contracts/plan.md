@@ -282,8 +282,8 @@ The new migration adds functions/triggers without rewriting existing rows. Rollb
 
 #### Manual
 
-- [ ] 2.5 Manager can update safe single and recurring classes
-- [ ] 2.6 Unsafe manager updates show feedback and preserve persisted data
+- [x] 2.5 Manager can update safe single and recurring classes — bf55653
+- [x] 2.6 Unsafe manager updates show feedback and preserve persisted data — bf55653
 
 ### Phase 3: HTTP Contracts and Quality Gates
 
