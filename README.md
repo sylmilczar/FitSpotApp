@@ -1,40 +1,60 @@
-### FitSpotApp
+# FitSpotApp
 
 A web application for managing fitness class bookings, allowing clients to reserve spots online and administrators to manage schedules and attendance.
 
-## Uruchamianie lokalne
+## Live Application
 
-Wymagania: Node.js 22.14.0 lub nowszy.
+The application is available online at:
 
-1. Zainstaluj zależności:
+https://fit-spot-app.vercel.app/
+
+## Local Development
+
+### Requirements
+
+- Node.js 22.14.0 or newer
+
+### Installation
+
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Utwórz lokalny plik środowiskowy:
+2. Create a local environment file:
 
    ```bash
    cp .env.example .env.local
    ```
 
-3. Uzupełnij w `.env.local` wartości `SUPABASE_URL` i `SUPABASE_KEY` danymi projektu Supabase.
+3. Add the `SUPABASE_URL` and `SUPABASE_KEY` values from your Supabase project to `.env.local`.
 
-4. Uruchom serwer deweloperski:
+4. Start the development server:
 
    ```bash
    npm run dev
    ```
 
-   Aplikacja będzie dostępna pod adresem [http://localhost:4321](http://localhost:4321).
+   The application will be available at:
 
-Do sprawdzenia wersji produkcyjnej użyj:
+   http://localhost:4321
+
+To test the production version locally, use:
 
 ```bash
 npm run build
 npm run preview
 ```
 
-Jeśli korzystasz z lokalnego Supabase, uruchom je wcześniej poleceniem `npx supabase start` (wymaga Dockera) i użyj lokalnych wartości w `.env.local`.
+## Local Supabase
 
-**For AI agent guidance, see [@AGENTS.md](AGENTS.md).**
+If you are using a local Supabase instance, start it beforehand with:
+
+```bash
+npx supabase start
+```
+
+This requires Docker.
+
+Use the local Supabase values in `.env.local` when working with the local database.
