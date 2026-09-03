@@ -3,69 +3,52 @@ import Topbar from "@/components/Topbar.astro";
 ---
 
 <main class="bg-wellness min-h-screen px-4 py-6 sm:px-6 sm:py-8">
-  <section class="mx-auto max-w-5xl">
+  <section class="mx-auto max-w-6xl">
     <Topbar variant="light" />
 
-    <div class="rounded-3xl border border-[#D9DEB8] bg-[#F8F8F5] p-8 sm:p-10">
+    <!-- Hero -->
+    <section class="rounded-3xl border border-[#D9DEB8] bg-[#F8F8F5] p-7 sm:p-10">
       <div>
         <p
           class="inline-flex rounded-full border border-[#C9D09A] bg-[#EEF1DB] px-3 py-1 text-xs font-semibold tracking-[0.18em] text-[#4F5A37] uppercase"
         >
           FitSpot Club
         </p>
-        <div class="mt-5 flex items-center gap-5">
-          <h1 class="text-4xl leading-tight font-bold text-[#1F1F1A] sm:text-5xl">
-            Train consistently without booking chaos.
-          </h1>
-        </div>
-        <p class="mt-4 text-base text-[#67675F] sm:text-lg">
-          FitSpot is a boutique fitness club where you can quickly check class schedules and reserve your spot.
+
+        <h1 class="mt-3 text-4xl leading-tight font-bold text-[#1F1F1A]">Train consistently without booking chaos.</h1>
+
+        <p class="mt-2 text-base leading-7 text-[#67675F] sm:text-lg">
+          Quickly check the class schedule, see available spots, and reserve your place online.
         </p>
-      </div>
-      <div class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-        <div>
-          <div class="mt-5 flex flex-wrap gap-3 text-sm font-medium text-[#4F5A37]">
-            <span class="rounded-lg border border-[#D9DEB8] bg-white px-3 py-2">Small group coaching</span>
-            <span class="rounded-lg border border-[#D9DEB8] bg-white px-3 py-2">Fast online booking</span>
-            <span class="rounded-lg border border-[#D9DEB8] bg-white px-3 py-2">7 days schedule access</span>
-          </div>
-          <div class="mt-8 flex flex-wrap items-center gap-3">
-            <a
-              href="/classes"
-              class="inline-flex w-full items-center justify-center rounded-xl bg-[#4F5A37] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#3E472B]"
-            >
-              Browse classes
-            </a>
-          </div>
 
-          <dl class="mt-8 grid max-w-xl grid-cols-3 gap-3">
-            <div class="rounded-xl border border-[#E0E5C0] bg-white p-3">
-              <dt class="text-xs font-medium text-[#67675F]">Slots</dt>
-              <dd class="mt-1 text-xl font-bold text-[#1F1F1A]">Live</dd>
-            </div>
-            <div class="rounded-xl border border-[#E0E5C0] bg-white p-3">
-              <dt class="text-xs font-medium text-[#67675F]">Booking</dt>
-              <dd class="mt-1 text-xl font-bold text-[#1F1F1A]">24/7</dd>
-            </div>
-            <div class="rounded-xl border border-[#E0E5C0] bg-white p-3">
-              <dt class="text-xs font-medium text-[#67675F]">Support</dt>
-              <dd class="mt-1 text-xl font-bold text-[#1F1F1A]">Direct</dd>
-            </div>
-          </dl>
-        </div>
-
-        <div class="rounded-2xl border border-[#D9DEB8] bg-white p-6 shadow-[0_8px_20px_rgba(79,90,55,0.08)]">
-          <h2 class="text-sm font-semibold tracking-wide text-[#4F5A37] uppercase">Contact</h2>
-          <p class="mt-3 text-sm text-[#67675F]">Questions about class level or available spots?</p>
-          <ul class="mt-4 space-y-2 text-sm text-[#1F1F1A]">
-            <li>Phone: +48 600 123 456</li>
-            <li>Email: kontakt@fitspot.pl</li>
-            <li>Address: ul. Sportowa 12, Gdansk</li>
-          </ul>
+        <!-- Primary action -->
+        <div class="mt-7 flex w-full justify-center">
+          <a
+            href="/classes"
+            class="inline-flex w-full items-center justify-center rounded-lg bg-[#4F5A37] px-8 py-2.5 text-base font-semibold text-white transition-colors hover:bg-[#3E472B]"
+          >
+            Browse classes
+          </a>
         </div>
       </div>
-    </div>
 
+      <!-- Benefits -->
+      <div class="mx-auto mt-10 grid max-w-2xl grid-cols-3 border-t border-[#E0E5C0] pt-6 text-center">
+        <div class="pr-4">
+          <span>✓ Small group coaching</span>
+        </div>
+
+        <div class="border-l border-[#E0E5C0] px-4">
+          <span>✓ Fast online booking</span>
+        </div>
+
+        <div class="border-l border-[#E0E5C0] pl-4">
+          <span>✓ 7-day schedule access</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Information -->
     <div class="mt-8 grid gap-4 md:grid-cols-3">
       <article class="rounded-2xl border border-[#E6E6DD] bg-white p-5">
         <h3 class="text-base font-semibold text-[#1F1F1A]">Who we are</h3>
@@ -86,5 +69,15 @@ import Topbar from "@/components/Topbar.astro";
         </p>
       </article>
     </div>
+
+    <!-- Contact -->
+    <section class="mt-8 border-t border-[#E0E5C0] pt-6">
+      <div class="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:gap-6">
+        <p class="font-semibold tracking-wide text-[#4F5A37] uppercase">Contact</p>
+        <a href="tel:+48600123456" class="transition-colors hover:text-[#4F5A37]"> +48 600 123 456 </a>
+        <a href="mailto:kontakt@fitspot.pl" class="transition-colors hover:text-[#4F5A37]"> kontakt@fitspot.pl </a>
+        <span>ul. Sportowa 12, Gdansk</span>
+      </div>
+    </section>
   </section>
 </main>
